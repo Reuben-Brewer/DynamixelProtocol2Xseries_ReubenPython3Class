@@ -1,0 +1,21 @@
+Metadata-Version: 1.0
+Name: ftd2xx
+Version: 1.0
+Summary: Python interface to ftd2xx.dll from FTDI using ctypes based on d2xx by Pablo Bleyer
+Home-page: https://github.com/ctrl-shift-esc/ftd2xx
+Author: Krishna Sudhakar
+Author-email: me@krishnasudhakar.me
+License: BSD
+Description: ======
+        FTD2XX
+        ======
+        
+        ftd2xx is a simple python wrapper around the `D2XX DLL`_ from FTDI using
+        ctypes. It is based on Pablo Bleyer Kocik's d2xx_ extension.
+        
+        
+        .. _d2xx: http://bleyer.org/pyusb/
+        .. _D2XX DLL: http://www.ftdichip.com/Drivers/D2XX.htm
+        
+Keywords: ftd2xx d2xx ftdi
+Platform: UNKNOWN
