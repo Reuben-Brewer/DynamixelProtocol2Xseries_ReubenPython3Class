@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision G, 06/17/2024
+Software Revision H, 07/31/2024
 
 Verified working on: Python 3.11 for Windows 11 64-bit and Raspberry Pi Buster (no Mac testing yet).
 '''
@@ -166,12 +166,16 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                                              "PresentVelocity",
                                              "PresentPosition",
                                              "PresentInputVoltage",
-                                             "PresentTemperature"]
+                                             "PresentTemperature",
+                                             "Shutdown"]
+
+
 
         self.MotorType_AcceptableDict = dict([("None", dict([("MotorType_DynamixelInteger", -1)])),
-                                                     ("NONE", dict([("MotorType_DynamixelInteger", -1)])),
-                                                     ("XC330", dict([("MotorType_DynamixelInteger", 0)])),
-                                                     ("XM540", dict([("MotorType_DynamixelInteger", 1)]))])
+                                                     ("NONE", dict([("MotorType_DynamixelInteger", -1), ("MotorTorqueConstant_Dict", dict([("PolynomialFitMotorCurrentToMotorTorque", []), ("Current_MinValueInputToPolyfit", 0.0), ("Current_MaxValueInputToPolyfit", 0.0)]))])),
+                                                     ("XC330-181-T", dict([("MotorType_DynamixelInteger", 0), ("MotorTorqueConstant_Dict", dict([("PolynomialFitMotorCurrentToMotorTorque", [-0.53234, 1.0999, -0.12041]), ("Current_MinValueInputToPolyfit", 0.20), ("Current_MaxValueInputToPolyfit", 0.63)]))])),
+                                                     ("XC330-288-T", dict([("MotorType_DynamixelInteger", 1), ("MotorTorqueConstant_Dict", dict([("PolynomialFitMotorCurrentToMotorTorque", [-0.53234, 1.0999, -0.12041]), ("Current_MinValueInputToPolyfit", 0.16), ("Current_MaxValueInputToPolyfit", 0.73)]))])),
+                                                     ("XM540", dict([("MotorType_DynamixelInteger", 2), ("MotorTorqueConstant_Dict", dict([("PolynomialFitMotorCurrentToMotorTorque", []), ("Current_MinValueInputToPolyfits", 0.0), ("Current_MaxValueInputToPolyfit", 0.0)]))]))])
         #########################################################
         #########################################################
 
@@ -333,6 +337,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
         #########################################################
         #########################################################
         self.MotorType_DynamixelIntegerList = []
+        self.MotorTorqueConstant_ListOfDicts = []
         if "MotorType_StringList" not in setup_dict:
             print("DynamixelProtocol2Xseries_ReubenPython3Class ERROR: Must initialize object with 'MotorType_StringList' argument.")
             return
@@ -346,6 +351,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                 else:
                     servo_type_dict_temp = self.MotorType_AcceptableDict[MotorType_element]
                     self.MotorType_DynamixelIntegerList.append(servo_type_dict_temp["MotorType_DynamixelInteger"])
+                    self.MotorTorqueConstant_ListOfDicts.append(servo_type_dict_temp["MotorTorqueConstant_Dict"])
 
         self.NumberOfMotors = len(setup_dict["MotorType_StringList"])
 
@@ -361,6 +367,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
         print("DynamixelProtocol2Xseries_ReubenPython3Class __init__: NumberOfMotors: " + str(self.NumberOfMotors))
         print("DynamixelProtocol2Xseries_ReubenPython3Class __init__: MotorType_StringList: " + str(self.MotorType_StringList))
         print("DynamixelProtocol2Xseries_ReubenPython3Class __init__: MotorType_DynamixelIntegerList: " + str(self.MotorType_DynamixelIntegerList))
+        print("DynamixelProtocol2Xseries_ReubenPython3Class __init__: MotorTorqueConstant_ListOfDicts: " + str(self.MotorTorqueConstant_ListOfDicts))
         #########################################################
         #########################################################
 
@@ -452,6 +459,19 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
 
         #########################################################
         #########################################################
+        if "EnableSafetyShutoff" in setup_dict:
+            EnableSafetyShutoff_TEMP = self.PassThrough0and1values_ExitProgramOtherwise("EnableSafetyShutoff", setup_dict["EnableSafetyShutoff"])
+        else:
+            EnableSafetyShutoff_TEMP = 1
+
+        self.EnableSafetyShutoff = [EnableSafetyShutoff_TEMP]*self.NumberOfMotors
+
+        print("DynamixelProtocol2Xseries_ReubenPython3Class __init__: self.EnableSafetyShutoff: " + str(self.EnableSafetyShutoff))
+        #########################################################
+        #########################################################
+
+        #########################################################
+        #########################################################
         if "ENABLE_SETS" in setup_dict:
             self.ENABLE_SETS = self.PassThrough0and1values_ExitProgramOtherwise("ENABLE_SETS", setup_dict["ENABLE_SETS"])
         else:
@@ -535,7 +555,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
 
         self.ControlType = list(self.ControlType_StartingValueList)
         self.ControlType_TO_BE_SET = list(self.ControlType_StartingValueList)
-        self.ControlType_NEEDS_TO_BE_CHANGED_FLAG = [0] * self.NumberOfMotors
+        self.ControlType_NEEDS_TO_BE_CHANGED_FLAG = [0] * self.NumberOfMotors #UNICORN
         self.ControlType_GUI_NEEDS_TO_BE_CHANGED_FLAG = [0] * self.NumberOfMotors
         self.ControlType_NEEDS_TO_BE_ASKED_FLAG = [1] * self.NumberOfMotors
         ##########################################
@@ -586,7 +606,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
 
             FailedFlag = 0
             for item in temp_list:
-                if isinstance(item, float) == 1:
+                if isinstance(item, float) == 1 or isinstance(item, int) == 1:
                     item = int(item)
                     item_dynamixelunits = DynamixelProtocol2Xseries_ReubenPython3Class.ConvertBetweenAllAngularUnits(item, "deg")["dynamixelunits"]
                     if 1:#item_dynamixelunits >= 0 and item <= 4095.0:
@@ -617,7 +637,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
 
             FailedFlag = 0
             for item in temp_list:
-                if isinstance(item, float) == 1:
+                if isinstance(item, float) == 1 or isinstance(item, int) == 1:
                     item = int(item)
                     item_dynamixelunits = DynamixelProtocol2Xseries_ReubenPython3Class.ConvertBetweenAllAngularUnits(item, "deg")["dynamixelunits"]
                     if 1:#item_dynamixelunits >= 0 and item <= 4095.0:
@@ -774,7 +794,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
 
             FailedFlag = 0
             for item in temp_list:
-                if isinstance(item, float) == 1:
+                if isinstance(item, float) == 1 or isinstance(item, int) == 1:
                     item = int(item)
                     if item >= -2047.0 and item <= 2047.0:
                         self.Current_DynamixelUnits_StartingValueList.append(item)
@@ -803,7 +823,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
 
             FailedFlag = 0
             for item in temp_list:
-                if isinstance(item, float) == 1:
+                if isinstance(item, float) == 1 or isinstance(item, int) == 1:
                     item = item
                     item_dynamixel_units = int(self.ConvertBetweenAllCurrentUnits(item, "percent")["dynamixelunits"])
                     if item >= 0 and item <= 1:
@@ -834,7 +854,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
 
             FailedFlag = 0
             for item in temp_list:
-                if isinstance(item, float) == 1:
+                if isinstance(item, float) == 1 or isinstance(item, int) == 1:
                     item = int(item)
                     if item >= -2047.0 and item <= 2047.0:
                         self.Current_DynamixelUnits_min.append(item)
@@ -867,7 +887,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
 
             FailedFlag = 0
             for item in temp_list:
-                if isinstance(item, float) == 1:
+                if isinstance(item, float) == 1 or isinstance(item, int) == 1:
                     item = int(item)
                     if item >= 0 and item <= 885.0:
                         self.PWM_DynamixelUnits_StartingValueList.append(item)
@@ -895,7 +915,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
 
             FailedFlag = 0
             for item in temp_list:
-                if isinstance(item, float) == 1:
+                if isinstance(item, float) == 1 or isinstance(item, int) == 1:
                     item = int(item)
                     if item >= 0 and item <= 885.0:
                         self.PWM_DynamixelUnits_max.append(item)
@@ -922,7 +942,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
 
             FailedFlag = 0
             for item in temp_list:
-                if isinstance(item, float) == 1:
+                if isinstance(item, float) == 1 or isinstance(item, int) == 1:
                     item = int(item)
                     if item >= 0 and item <= 885.0:
                         self.PWM_DynamixelUnits_min.append(item)
@@ -953,7 +973,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
             FailedFlag = 0
             for item in temp_list:
                 #print(item)
-                if isinstance(item, float) == 1:
+                if isinstance(item, float) == 1 or isinstance(item, int) == 1:
                     item = int(item)
                     if item >= 0 and item <= 1023:
                         self.MinPositionLimit_StartingValueList.append(item)
@@ -983,7 +1003,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
             FailedFlag = 0
             for item in temp_list:
                 #print(item)
-                if isinstance(item, float) == 1:
+                if isinstance(item, float) == 1 or isinstance(item, int) == 1:
                     item = int(item)
                     if item >= 0 and item <= 1023:
                         self.MaxPositionLimit_StartingValueList.append(item)
@@ -1034,6 +1054,9 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
         print("StartEngagedFlag valid: " + str(self.StartEngagedFlag))
         ##########################################
 
+        ##########################################
+        self.SendInstructionPacket_SetPosition_Counter = [0] * self.NumberOfMotors
+        ##########################################
 
         #########################################################
         #########################################################
@@ -1090,11 +1113,11 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
         self.CurrentReceived_DynamixelUnits = [-1] * self.NumberOfMotors
         self.CurrentReceived_Amps = [-1] * self.NumberOfMotors
         self.CurrentReceived_Percent0to1 = [-1] * self.NumberOfMotors
-        self.Current_DynamixelUnits_NeedsToBeChangedFlag = [0] * self.NumberOfMotors
+        self.Current_DynamixelUnits_NeedsToBeChangedFlag = [1] * self.NumberOfMotors
         self.Current_DynamixelUnits_GUI_NeedsToBeChangedFlag = [0] * self.NumberOfMotors
 
         self.VelocityReceived_DynamixelUnits = [-1] * self.NumberOfMotors
-        self.Velocity_DynamixelUnits_NeedsToBeChangedFlag = [0] * self.NumberOfMotors
+        self.Velocity_DynamixelUnits_NeedsToBeChangedFlag = [1] * self.NumberOfMotors
         self.Velocity_DynamixelUnits_GUI_NeedsToBeChangedFlag = [0] * self.NumberOfMotors
 
         self.PositionReceived_DynamixelUnits = [0] * self.NumberOfMotors
@@ -1152,6 +1175,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
         self.ErrorFlag_MotorEncoder_Received = [-1] * self.NumberOfMotors
         self.ErrorFlag_Overheating_Received = [-1] * self.NumberOfMotors
         self.ErrorFlag_InputVoltage_Received = [-1] * self.NumberOfMotors
+        self.ErrorFlag_SerialCommunication = [-1] * self.NumberOfMotors
 
         self.WatchdogTimerDurationMilliseconds = [-1] * self.NumberOfMotors
 
@@ -1987,6 +2011,8 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
     #######################################################################################################################
     def SendInstructionPacket_SetOperatingMode(self, MotorID, OperatingModeString, print_bytes_for_debugging = 0):
 
+        print("SendInstructionPacket_SetOperatingMode event fired!")
+
         ############################################################
         ############################################################ FOR SOME REASON, SendInstructionPacket_SetOperatingMode ONLY WORKS IF WE FIRST REBOOT THE MOTOR
         self.SendInstructionPacket_Reboot(MotorID)
@@ -2007,7 +2033,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
         else:
             dummy = 0
             self.ControlType[MotorID] = OperatingModeString
-            self.MyPrint_WithoutLogFile("@@@@@@@@@@@@@@@@@@@@ SendInstructionPacket_SetOperatingMode set operating mode to " + self.ControlType[MotorID] + " on motor " + str(MotorID) + " @@@@@@@@@@@@@@@@@@@@")
+            print("@@@@@@@@@@@@@@@@@@@@ SendInstructionPacket_SetOperatingMode set operating mode to " + self.ControlType[MotorID] + " on motor " + str(MotorID) + " @@@@@@@@@@@@@@@@@@@@")
 
             if OperatingModeString == "CurrentControl":
                 self.Current_DynamixelUnits_NeedsToBeChangedFlag[MotorID] = 1
@@ -2027,6 +2053,34 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
             self.EngagedState_NeedsToBeChangedFlag[MotorID] = 1
 
         return 1
+    #######################################################################################################################
+    #######################################################################################################################
+
+    #######################################################################################################################
+    #######################################################################################################################
+    def SendInstructionPacket_SetShutdown(self, MotorID, EnableSafetyShutoff, print_bytes_for_debugging = 0):
+
+        if EnableSafetyShutoff in [0, 1]:
+
+            if EnableSafetyShutoff == 1:
+                ShutdownValue_Decimal = 52
+            else:
+                ShutdownValue_Decimal = 0
+
+            ADDR_PRO_SHUTDOWN = 63
+
+            dxl_comm_result = self.packetHandler.write1ByteTxOnly(self.portHandler, MotorID, ADDR_PRO_SHUTDOWN, ShutdownValue_Decimal)
+            if dxl_comm_result != COMM_SUCCESS:
+                self.MyPrint_WithoutLogFile("%s" % self.packetHandler.getTxRxResult(dxl_comm_result))
+            else:
+                dummy = 0
+
+            self.EnableSafetyShutoff[MotorID] = EnableSafetyShutoff
+
+            print("SendInstructionPacket_SetShutdown event fired for MotorID " + str(MotorID) + " with EnabledSafetyShutoff state " + str(self.EnableSafetyShutoff[MotorID]) + " and decimal value " + str(ShutdownValue_Decimal))
+
+        else:
+            print("SendInstructionPacket_SetShutdown error: EnableSafetyShutoff must be 0 or 1.")
     #######################################################################################################################
     #######################################################################################################################
 
@@ -2212,6 +2266,8 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                 dummy = 0
 
             self.Position_DynamixelUnits[MotorID] = Position_limited
+
+            self.SendInstructionPacket_SetPosition_Counter[MotorID] = self.SendInstructionPacket_SetPosition_Counter[MotorID] + 1
 
             if print_bytes_for_debugging == 1:
                 print("SendInstructionPacket_SetPosition: Sent Position_limited command of " + str(Position_limited) + " to MotorID " + str(MotorID))
@@ -2569,6 +2625,9 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
             elif VariableNameString == "PresentTemperature":
                 PortRegister = 146
                 ReadLength = 1 #Should be 1 according to the datasheet, but 2 works and I confirmed here: https://github.com/ROBOTIS-GIT/DynamixelSDK/issues/152
+            elif VariableNameString == "Shutdown":
+                PortRegister = 63
+                ReadLength = 1
             else:
                 self.print("$$$$$$$$$$$$$$$$$$$$$$$$$ ReadVariable ERROR: Variable name '" + VariableNameString + " is no valid! $$$$$$$$$$$$$$$$$$$$$$$$$")
                 return "error_VariableNameString"
@@ -2607,24 +2666,23 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
 
             ##########################################################
             if dxl_comm_result != COMM_SUCCESS:
-                #self.MyPrint_WithoutLogFile("%s" % self.packetHandler.getTxRxResult(dxl_comm_result))
+                print("MotorID = " + str(MotorID) +", ReadVariable: error_serial_dxl_comm with dxl_data = " + str(dxl_data))
                 self.portHandler.clearPort()
-                return "error_serial_dxl_comm"
+                return
             elif dxl_error != 0:
-                #self.MyPrint_WithoutLogFile("%s" % self.packetHandler.getRxPacketError(dxl_error))
+                print("MotorID = " + str(MotorID) + ", ReadVariable: error_serial_dxl_error with dxl_data = " + str(dxl_data))
                 self.portHandler.clearPort()
-                return "error_serial_dxl_error"
             ##########################################################
 
             ##########################################################
             if VariableNameString == "PresentInputVoltage" or VariableNameString == "MaxVoltageLimit" or VariableNameString == "MinVoltageLimit":
-                Data_Value = dxl_data
+                Data_Value = 0.1*dxl_data
                 #if dxl_data >= 95 and dxl_data <= 160:
                 #    Data_Value = dxl_data*0.1
                 #else:
                 #    return -1111111111
 
-            elif VariableNameString == "PresentCurrent":
+            elif VariableNameString == "PresentCurrent" or VariableNameString == "CurrentLimit":
                 Data_Value = dxl_data/1000.0
 
                 #if dxl_data >= 0 and dxl_data <= 100:
@@ -2662,7 +2720,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
             ##########################################################
 
             #self.portHandler.clearPort()
-            #print("ReadVariable: " + str(Data_Value))
+            #print("ReadVariable for variable " + str(VariableNameString) + ": "+ str(Data_Value))
             return Data_Value
 
         except:
@@ -2906,7 +2964,8 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
         time.sleep(self.TimeToWaitBetweenCriticalInstructions)
         self.SendInstructionPacket_SetStatusReturnLevel(MotorIndex, 1) #0: Do not respond to any instructions, 1: Respond only to READ_DATA instructions, 2: Respond to all instructions
         time.sleep(self.TimeToWaitBetweenCriticalInstructions)
-
+        self.SendInstructionPacket_SetShutdown(MotorIndex, self.EnableSafetyShutoff[MotorIndex])
+        time.sleep(self.TimeToWaitBetweenCriticalInstructions)
 
         if self.HasMotorEverBeenInitializedFlag[MotorIndex] == 0:
             if self.StartEngagedFlag[MotorIndex] == 1:
@@ -2985,11 +3044,15 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
         #############################################################################################################################################
         while self.EXIT_PROGRAM_FLAG == 0:
 
-            ##############################################################################################  Start GETs
+            ##############################################################################################  Start GET's
+            ##############################################################################################
+            ##############################################################################################
             ##############################################################################################
             if self.GetVariablesEveryNloopsCycles >= 0:
                 try:
 
+                    ##############################################################################################
+                    ##############################################################################################
                     ##############################################################################################
                     if self.AskForInfrequentDataReadLoopCounter == 0:
 
@@ -3001,12 +3064,19 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                         ##############################################################################################
                         ##############################################################################################
 
+                        ##############################################################################################
+                        ##############################################################################################
                         for MotorIndex in range(0, self.NumberOfMotors):
 
                             for VariableNameString in self.ListOfVariableNameStringsToGet:
                                 Value = self.ReadVariable(MotorIndex, VariableNameString, print_bytes_for_debugging=0)
                                 #print("Value: " + str(Value))
-                                self.MostRecentDataDict[VariableNameString][MotorIndex] = Value
+                                try:
+                                    self.MostRecentDataDict[VariableNameString][MotorIndex] = float(Value)
+                                except:
+                                    self.MostRecentDataDict[VariableNameString][MotorIndex] = str(Value)
+                        ##############################################################################################
+                        ##############################################################################################
 
                     else:
 
@@ -3017,30 +3087,108 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                             #print("#### RESET ####")
 
                     ##############################################################################################
+                    ##############################################################################################
+                    ##############################################################################################
+
+                    ##############################################################################################
+                    ##############################################################################################
+                    ##############################################################################################
+                    try:
+
+                        if "PresentCurrent" in self.MostRecentDataDict:
+
+                            for MotorIndex in range(0, self.NumberOfMotors):
+                                ##############################################################################################
+                                ##############################################################################################
+
+                                if isinstance(self.MostRecentDataDict["PresentCurrent"][MotorIndex], str) == 0:
+                                    Current_AbsVal = abs(self.MostRecentDataDict["PresentCurrent"][MotorIndex]) #Our Polyfit curve only works for positive values of current
+
+                                    Current_MinValueInputToPolyfit = self.MotorTorqueConstant_ListOfDicts[MotorIndex]["Current_MinValueInputToPolyfit"]
+                                    Current_MaxValueInputToPolyfit = self.MotorTorqueConstant_ListOfDicts[MotorIndex]["Current_MaxValueInputToPolyfit"]
+
+                                    if Current_AbsVal >= Current_MinValueInputToPolyfit and Current_AbsVal <= Current_MaxValueInputToPolyfit:
+
+
+                                        ##############################################################################################
+                                        if self.MostRecentDataDict["PresentCurrent"][MotorIndex] >= 0:
+                                            Current_Sign = 1
+                                        else:
+                                            Current_Sign = -1
+                                        ##############################################################################################
+
+                                        Kt_Polynomial = self.MotorTorqueConstant_ListOfDicts[MotorIndex]["PolynomialFitMotorCurrentToMotorTorque"]
+                                        N = len(Kt_Polynomial)
+                                        Torque = 0.0
+
+                                        ##############################################################################################
+                                        for Index in range(0, len(Kt_Polynomial)):
+                                            #print("MotorIndex: " + str(MotorIndex) + ", PolyIndex: " + str(Index) + ", Kt_term: " + str(Kt_Polynomial[Index]) + ", Current_AbsVal: " + str(Current_AbsVal) + ", Torque: " + str(Torque))
+                                            #Torque = P[0]*(X**2) + P[1]*(X**1) + P[2]*(X**0)
+
+                                            Torque = Torque + Kt_Polynomial[Index]*(Current_AbsVal**(N-1-Index))
+                                        ##############################################################################################
+
+                                        Torque = Current_Sign*Torque
+
+                                        Torque = 0.0*Torque #Torque directionality appears to be reversed, not sure why as the current directionality is correct.
+                                        ##############################################################################################
+
+                                        ##############################################################################################
+                                        if "TorqueNMcalculatedFromMotorCurrent" not in self.MostRecentDataDict:
+                                            self.MostRecentDataDict["TorqueNMcalculatedFromMotorCurrent"] = [0.0]*self.NumberOfMotors
+                                        else:
+                                            self.MostRecentDataDict["TorqueNMcalculatedFromMotorCurrent"][MotorIndex] =  Torque
+                                        ##############################################################################################
+
+                                ##############################################################################################
+                                ##############################################################################################
+
+                        else:
+                            self.MostRecentDataDict["TorqueNMcalculatedFromMotorCurrent"][MotorIndex] = -1.0
+                        ##############################################################################################
+                        ##############################################################################################
+
+                    except:
+                        exceptions = sys.exc_info()[0]
+                        print("if PresentCurrent in self.MostRecentDataDict:, exceptions: %s" % exceptions)
+                        traceback.print_exc()
+
+                    ##############################################################################################
+                    ##############################################################################################
+                    ##############################################################################################
 
                     self.UpdateFrequencyCalculation_Rx_CalculatedFromMainThread_Filtered()
 
                 except:
                     exceptions = sys.exc_info()[0]
-                    self.MyPrint_WithoutLogFile("MainThread GETS, exceptions: %s" % exceptions)
-                    traceback.print_exc()
-            ##############################################################################################
-            ############################################################################################## End GETs
+                    print("MainThread GETS, exceptions: %s" % exceptions)
+                    #traceback.print_exc()
 
-            ############################################################################################## StartSETs
+            ##############################################################################################
+            ##############################################################################################
+            ##############################################################################################
+            ############################################################################################## End GET's
+
+            ############################################################################################## StartSET's
+            ##############################################################################################
+            ##############################################################################################
             ##############################################################################################
             if self.ENABLE_SETS == 1:
                 try:
 
                     ##############################################################################################
                     ##############################################################################################
+                    ##############################################################################################
                     self.CurrentTime_Tx_CalculatedFromMainThread = self.getPreciseSecondsTimeStampString() - self.StartingTime_CalculatedFromMainThread
+                    ##############################################################################################
                     ##############################################################################################
                     ##############################################################################################
 
                     for MotorIndex in range(0, self.NumberOfMotors):
 
-                        #########################################################
+                        ##############################################################################################
+                        ##############################################################################################
                         if self.Reboot_NeedsToTakePlaceFlag[MotorIndex] == 1:
                             self.SendInstructionPacket_Reboot(MotorIndex)
                             time.sleep(0.25) #FIGURE OUT HOW LOW THIS CAN GO
@@ -3050,16 +3198,20 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                             self.ResetSerial()
 
                             self.Reboot_NeedsToTakePlaceFlag[MotorIndex] = 0
-                        #########################################################
+                        ##############################################################################################
+                        ##############################################################################################
 
-                        #########################################################
+                        ##############################################################################################
+                        ##############################################################################################
                         if self.ResetSerial_NeedsToTakePlaceFlag[MotorIndex] == 1:
                             self.ResetSerial()
                             self.ResetSerial_NeedsToTakePlaceFlag[MotorIndex] = 0
-                        #########################################################
+                        ##############################################################################################
+                        ##############################################################################################
 
                         #'''
-                        #########################################################
+                        ##############################################################################################
+                        ##############################################################################################
                         if self.ControlType_NEEDS_TO_BE_CHANGED_FLAG[MotorIndex] == 1:
                             self.SendInstructionPacket_SetOperatingMode(MotorIndex, self.ControlType_TO_BE_SET[MotorIndex])
                             self.ControlType_NEEDS_TO_BE_ASKED_FLAG[MotorIndex] = 1
@@ -3069,10 +3221,12 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                             self.SendInstructionPacket_SetCurrentLimit(MotorIndex, self.Current_DynamixelUnits_max[MotorIndex], 0)
 
                             self.ControlType_NEEDS_TO_BE_CHANGED_FLAG[MotorIndex] = 0
-                        #########################################################
+                        ##############################################################################################
+                        ##############################################################################################
                         #'''
 
-                        #########################################################
+                        ##############################################################################################
+                        ##############################################################################################
                         if self.ToggleMinMax_NeedsToTakePlaceFlag[MotorIndex] == 1:
 
                             self.MyPrint_WithoutLogFile("Position_DynamixelUnits_min valid: " + str(self.Position_DynamixelUnits_min))
@@ -3138,7 +3292,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
 
                                 elif self.ControlType[MotorIndex] == "PositionControl" or self.ControlType[MotorIndex] == "ExtendedPositionControlMultiTurn" or self.ControlType[MotorIndex] == "CurrentBasedPositionControl":
                                     self.Position_DynamixelUnits_TO_BE_SET[MotorIndex] = self.Position_DynamixelUnits_max[MotorIndex]
-                                    print(self.Position_DynamixelUnits_TO_BE_SET[MotorIndex])
+                                    #print(self.Position_DynamixelUnits_TO_BE_SET[MotorIndex])
                                     self.Position_DynamixelUnits_GUI_NeedsToBeChangedFlag[MotorIndex] = 1
                                     self.Position_DynamixelUnits_NeedsToBeChangedFlag[MotorIndex] = 1
 
@@ -3149,39 +3303,51 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                             
                             self.ToggleMinMax_state[MotorIndex] = self.ToggleMinMax_TO_BE_SET[MotorIndex]
                             self.ToggleMinMax_NeedsToTakePlaceFlag[MotorIndex] = 0
-                        #########################################################
+                        ##############################################################################################
+                        ##############################################################################################
 
-                        ###############################################
+                        ##############################################################################################
+                        ##############################################################################################
                         if self.MinPositionLimit_NeedsToBeChangedFlag[MotorIndex] == 1:
                             #self.SendInstructionPacket_SetCWandMaxPositionLimits(MotorIndex, self.MinPositionLimit_TO_BE_SET[MotorIndex], self.MaxPositionLimit_TO_BE_SET[MotorIndex])
                             self.MinPositionLimit_NeedsToBeChangedFlag[MotorIndex] = 0
-                        ###############################################
+                        ##############################################################################################
+                        ##############################################################################################
 
-                        ###############################################
+                        ##############################################################################################
+                        ##############################################################################################
                         if self.MaxPositionLimit_NeedsToBeChangedFlag[MotorIndex] == 1:
                             #self.SendInstructionPacket_SetCWandMaxPositionLimits(MotorIndex, self.MinPositionLimit_TO_BE_SET[MotorIndex], self.MaxPositionLimit_TO_BE_SET[MotorIndex])
                             self.MaxPositionLimit_NeedsToBeChangedFlag[MotorIndex] = 0
-                        ###############################################
+                        ##############################################################################################
+                        ##############################################################################################
 
-                        ###############################################
+                        ##############################################################################################
+                        ##############################################################################################
                         if self.EngagedState_NeedsToBeChangedFlag[MotorIndex] == 1:
                             self.SendInstructionPacket_SetTorqueEnable(MotorIndex, self.EngagedState_TO_BE_SET[MotorIndex])
                             self.EngagedState_NeedsToBeChangedFlag[MotorIndex] = 0
-                        ###############################################
+                        ##############################################################################################
+                        ##############################################################################################
 
-                        ###############################################
+                        ##############################################################################################
+                        ##############################################################################################
                         if self.LEDstate_NeedsToBeChangedFlag[MotorIndex] == 1:
                             self.SendInstructionPacket_SetLED(MotorIndex, self.LEDstate_TO_BE_SET[MotorIndex])
                             self.LEDstate_NeedsToBeChangedFlag[MotorIndex] = 0
-                        ###############################################
+                        ##############################################################################################
+                        ##############################################################################################
 
-                        ###############################################
+                        ##############################################################################################
+                        ##############################################################################################
                         if self.MaxPWM_DynamixelUnits_NeedsToBeChangedFlag[MotorIndex] == 1:
                             self.SendInstructionPacket_SetMaxPWM(MotorIndex, self.MaxPWM_DynamixelUnits_TO_BE_SET[MotorIndex])
                             self.MaxPWM_DynamixelUnits_NeedsToBeChangedFlag[MotorIndex] = 0
-                        ###############################################
+                        ##############################################################################################
+                        ##############################################################################################
 
-                        ###############################################
+                        ##############################################################################################
+                        ##############################################################################################
                         if self.Current_DynamixelUnits_NeedsToBeChangedFlag[MotorIndex] > 0:
 
                             if self.ControlType[MotorIndex] == "CurrentControl":
@@ -3189,59 +3355,74 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                                 self.SendInstructionPacket_SetGoalCurrent_ForCurrentAndCurrentBasedPositionControl(MotorIndex, Current_limited, 0)
 
                             else:
-                                Current_limited = self.LimitNumber_IntOutputOnly(10, self.Current_DynamixelUnits_max[MotorIndex], self.Current_DynamixelUnits_TO_BE_SET[MotorIndex])
+                                Current_limited = self.LimitNumber_IntOutputOnly(0.0, self.Current_DynamixelUnits_max[MotorIndex], self.Current_DynamixelUnits_TO_BE_SET[MotorIndex])
                                 self.SendInstructionPacket_SetCurrentLimit(MotorIndex, Current_limited, 0)
+
+                                # MUST ALSO SET GOAL CURRENT FOR CURRENT LIMIT TO WORK
+                                Current_limited = self.LimitNumber_IntOutputOnly(self.Current_DynamixelUnits_min[MotorIndex], self.Current_DynamixelUnits_max[MotorIndex], self.Current_DynamixelUnits_TO_BE_SET[MotorIndex])
+                                self.SendInstructionPacket_SetGoalCurrent_ForCurrentAndCurrentBasedPositionControl(MotorIndex, Current_limited, 0)
+                                #
 
                             if self.Current_DynamixelUnits_NeedsToBeChangedFlag[MotorIndex] >= 1:
                                 self.Current_DynamixelUnits_NeedsToBeChangedFlag[MotorIndex] = self.Current_DynamixelUnits_NeedsToBeChangedFlag[MotorIndex] - 1
                                 #self.MyPrint_WithoutLogFile("self.Current_DynamixelUnits_NeedsToBeChangedFlag[" + str(MotorIndex) + "]: " + str(self.Current_DynamixelUnits_NeedsToBeChangedFlag[MotorIndex]))
 
-                        ###############################################
+                        ##############################################################################################
+                        ##############################################################################################
 
-                        ###############################################
+                        ##############################################################################################
+                        ##############################################################################################
                         if self.ControlType[MotorIndex] == "VelocityControl":
                             if self.Velocity_DynamixelUnits_NeedsToBeChangedFlag[MotorIndex] == 1:
                                 Velocity_limited = self.LimitNumber_IntOutputOnly(self.Velocity_DynamixelUnits_Min_UserSet[MotorIndex], self.Velocity_DynamixelUnits_Max_UserSet[MotorIndex], self.Velocity_DynamixelUnits_TO_BE_SET[MotorIndex])
                                 self.SendInstructionPacket_SetGoalVelocity_ForVelocityModeOnly(MotorIndex, Velocity_limited, 0)
                                 self.Velocity_DynamixelUnits_NeedsToBeChangedFlag[MotorIndex] = 0
-                        ###############################################
+                        ##############################################################################################
+                        ##############################################################################################
 
-                        ###############################################
+                        ##############################################################################################
+                        ##############################################################################################
                         if self.ControlType[MotorIndex] == "PositionControl" or self.ControlType[MotorIndex] == "ExtendedPositionControlMultiTurn" or self.ControlType[MotorIndex] == "CurrentBasedPositionControl":
 
-                            ###############################################
+                            ##############################################################################################
                             if self.Position_DynamixelUnits_NeedsToBeChangedFlag[MotorIndex]:
                                 Position_limited = self.LimitNumber_IntOutputOnly(self.Position_DynamixelUnits_min[MotorIndex], self.Position_DynamixelUnits_max[MotorIndex], self.Position_DynamixelUnits_TO_BE_SET[MotorIndex])
                                 self.SendInstructionPacket_SetPosition(MotorIndex, Position_limited, print_bytes_for_debugging=0)
                                 self.Position_DynamixelUnits_NeedsToBeChangedFlag[MotorIndex] = 0
-                            ###############################################
+                            ##############################################################################################
 
-                            ###############################################
+                            ##############################################################################################
                             if self.Velocity_DynamixelUnits_NeedsToBeChangedFlag[MotorIndex] == 1:
                                 Velocity_limited = self.LimitNumber_IntOutputOnly(self.Velocity_DynamixelUnits_Min_UserSet[MotorIndex], self.Velocity_DynamixelUnits_Max_UserSet[MotorIndex], self.Velocity_DynamixelUnits_TO_BE_SET[MotorIndex])
                                 self.SendInstructionPacket_SetProfileVelocity_ForAllModesExceptCurrentAndVelocity(MotorIndex, Velocity_limited, 0)
                                 self.Velocity_DynamixelUnits_NeedsToBeChangedFlag[MotorIndex] = 0
-                            ###############################################
+                            ##############################################################################################
 
-                        ###############################################
+                        ##############################################################################################
+                        ##############################################################################################
 
-                        ###############################################
+                        ##############################################################################################
+                        ##############################################################################################
                         if self.ControlType[MotorIndex] == "PWMcontrol":
                             if self.PWM_DynamixelUnits_NeedsToBeChangedFlag[MotorIndex]:
                                 PWM_limited = self.LimitNumber_IntOutputOnly(self.PWM_DynamixelUnits_min[MotorIndex], self.PWM_DynamixelUnits_max[MotorIndex], self.PWM_DynamixelUnits_TO_BE_SET[MotorIndex])
                                 self.SendInstructionPacket_SetPWM(MotorIndex, PWM_limited, 0)
                                 self.PWM_DynamixelUnits_NeedsToBeChangedFlag[MotorIndex] = 0
-                        ###############################################
+                        ##############################################################################################
+                        ##############################################################################################
 
                 except:
                     exceptions = sys.exc_info()[0]
                     print("MainThread SETS, exceptions: %s" % exceptions)
                     traceback.print_exc()
             ##############################################################################################
-            ##############################################################################################  End SETs
+            ##############################################################################################
+            ##############################################################################################
+            ##############################################################################################  End SET's
 
             ##############################################################################################
             ##############################################################################################
+
             self.MostRecentDataDict["ControlType"] = self.ControlType
 
             self.MostRecentDataDict["Time"] = self.CurrentTime_Tx_CalculatedFromMainThread
@@ -3252,7 +3433,35 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
             self.MostRecentDataDict["Velocity_DynamixelUnits_TO_BE_SET"] = self.Velocity_DynamixelUnits_TO_BE_SET
             self.MostRecentDataDict["Current_DynamixelUnits_TO_BE_SET"] = self.Current_DynamixelUnits_TO_BE_SET
             self.MostRecentDataDict["PWM_DynamixelUnits_TO_BE_SET"] = self.PWM_DynamixelUnits_TO_BE_SET
+
+            self.MostRecentDataDict["SendInstructionPacket_SetPosition_Counter"] = self.SendInstructionPacket_SetPosition_Counter
+
+            self.MostRecentDataDict["ErrorFlag_BYTE"] = self.ErrorFlag_BYTE
+            self.MostRecentDataDict["ErrorFlag_Overload_Received"] = self.ErrorFlag_Overload_Received
+            self.MostRecentDataDict["ErrorFlag_ElectricalShock_Received"] = self.ErrorFlag_ElectricalShock_Received
+            self.MostRecentDataDict["ErrorFlag_MotorEncoder_Received"] = self.ErrorFlag_MotorEncoder_Received
+            self.MostRecentDataDict["ErrorFlag_Overheating_Received"] = self.ErrorFlag_Overheating_Received
+            self.MostRecentDataDict["ErrorFlag_InputVoltage_Received"] = self.ErrorFlag_InputVoltage_Received
+
+            ##############################################################################################
+            if "PresentPosition" in self.MostRecentDataDict:
+                for MotorIndex in range(0, self.NumberOfMotors):
+                    if self.MostRecentDataDict["PresentPosition"][MotorIndex] == "error_serial_dxl_error":
+                        self.ErrorFlag_SerialCommunication[MotorIndex] = 1
+                    else:
+                        self.ErrorFlag_SerialCommunication[MotorIndex] = 0
+
+
+                self.MostRecentDataDict["ErrorFlag_SerialCommunication"] = self.ErrorFlag_SerialCommunication
+            ##############################################################################################
+
             '''
+            self.ErrorFlag_BYTE
+            self.ErrorFlag_Overload_Received
+            self.ErrorFlag_ElectricalShock_Received
+            self.ErrorFlag_MotorEncoder_Received
+            self.ErrorFlag_Overheating_Received
+            self.ErrorFlag_InputVoltage_Received
             self.OperatingModeReceived_int
             self.OperatingModeReceived_string
             self.PWMReceived_DynamixelUnits
@@ -3842,13 +4051,30 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                     #######################################################
 
                     #######################################################
+                    #######################################################
+
+                    #######################################################
                     self.ErrorLabel["text"] = "ErrorFlag_BYTE: " + str(self.ErrorFlag_BYTE) + \
                                             "\nErrorFlag_Overload_Received: " + str(self.ErrorFlag_Overload_Received) + \
                                             "\nErrorFlag_ElectricalShock_Received: " + str(self.ErrorFlag_ElectricalShock_Received) + \
                                             "\nErrorFlag_MotorEncoder_Received: " + str(self.ErrorFlag_MotorEncoder_Received) + \
                                             "\nErrorFlag_Overheating_Received: " + str(self.ErrorFlag_Overheating_Received) + \
-                                            "\nErrorFlag_InputVoltage_Received: " + str(self.ErrorFlag_InputVoltage_Received)
+                                            "\nErrorFlag_InputVoltage_Received: " + str(self.ErrorFlag_InputVoltage_Received) + \
+                                            "\nErrorFlag_SerialCommunication: " + str(self.ErrorFlag_SerialCommunication)
+                    #######################################################
 
+                    #######################################################
+                    ErrorFlagTripped = 0
+                    for MotorIndex in range(0, self.NumberOfMotors):
+                        if self.ErrorFlag_Overload_Received[MotorIndex] == 1 or self.ErrorFlag_ElectricalShock_Received[MotorIndex] == 1 or self.ErrorFlag_Overheating_Received[MotorIndex] == 1 or self.ErrorFlag_InputVoltage_Received[MotorIndex] == 1 or self.ErrorFlag_SerialCommunication[MotorIndex] == 1:
+                            ErrorFlagTripped = 1
+                            self.ErrorLabel["bg"] = self.TKinter_LightRedColor
+
+                    if ErrorFlagTripped == 0:
+                        self.ErrorLabel["bg"] = self.TKinter_DefaultGrayColor
+                    #######################################################
+
+                    #######################################################
                     #######################################################
 
                     #######################################################
