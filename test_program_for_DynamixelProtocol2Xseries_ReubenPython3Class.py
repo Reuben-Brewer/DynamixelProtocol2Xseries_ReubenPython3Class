@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision H, 07/31/2024
+Software Revision I, 09/06/2024
 
 Verified working on: Python 3.11 for Windows 11 64-bit and Raspberry Pi Buster (no Mac testing yet).
 '''
@@ -495,7 +495,7 @@ if __name__ == '__main__':
 
     GUI_COLUMN_DynamixelProtocol2Xseries = 0
     GUI_PADX_DynamixelProtocol2Xseries = 1
-    GUI_PADY_DynamixelProtocol2Xseries = 10
+    GUI_PADY_DynamixelProtocol2Xseries = 1
     GUI_ROWSPAN_DynamixelProtocol2Xseries = 1
     GUI_COLUMNSPAN_DynamixelProtocol2Xseries = 1
 
@@ -554,16 +554,16 @@ if __name__ == '__main__':
     SINUSOIDAL_MOTION_INPUT_ROMtestTimeToPeakAngle = 3.0
 
     global SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_0  # unicorn
-    SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_0 = -338.0 / 2.0
+    SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_0 = -400.0
 
     global SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_0
-    SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_0 = 338.0 / 2.0
+    SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_0 = 400.0
 
     global SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_1
-    SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_1 = -185.0 / 2.0
+    SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_1 = -500.0
 
     global SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_1
-    SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_1 = 185.0 / 2.0
+    SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_1 = 500.0
 
     global SINUSOIDAL_MOTION_INPUT_MinValue_VelocityControl
     SINUSOIDAL_MOTION_INPUT_MinValue_VelocityControl = -1.0
@@ -591,8 +591,8 @@ if __name__ == '__main__':
     global DynamixelProtocol2Xseries_MostRecentDict
     DynamixelProtocol2Xseries_MostRecentDict = dict()
 
-    global DynamixelProtocol2Xseries_PresentPositionList
-    DynamixelProtocol2Xseries_PresentPositionList = [0.0 ,0.0]
+    global DynamixelProtocol2Xseries_PresentPositionDegreesList
+    DynamixelProtocol2Xseries_PresentPositionDegreesList = [0.0 ,0.0]
 
     global DynamixelProtocol2Xseries_PresentCurrentList
     DynamixelProtocol2Xseries_PresentCurrentList = [0.0 ,0.0]
@@ -667,15 +667,15 @@ if __name__ == '__main__':
 
     global DynamixelProtocol2Xseries_setup_dict
     DynamixelProtocol2Xseries_setup_dict = dict([("GUIparametersDict", DynamixelProtocol2Xseries_GUIparametersDict),
-                                ("DesiredSerialNumber_USBtoSerialConverter", "FT891KTUA"), #Change to the serial number of your unique device, FT89FE7OA FT891KTUA
+                                ("DesiredSerialNumber_USBtoSerialConverter", "FT94VSKV"), #Change to the serial number of your unique device, FT89FE7OA FT891KTUA
                                 ("NameToDisplay_UserSet", "Example Name U2D2"),
                                 ("SerialBaudRate", 4000000),
-                                ("WatchdogTimeIntervalMilliseconds", 1000.0),
-                                ("GetVariablesEveryNloopsCycles", 50),
-                                ("ListOfVariableNameStringsToGet", ["PresentPosition", "PresentCurrent"]),
+                                ("WatchdogTimeIntervalMilliseconds", 100.0),
+                                ("EnableSafetyShutoff", 0),
+                                ("GetVariablesEveryNloopsCycles", 3),
                                 ("ENABLE_SETS", 1),
-                                ("MainThread_TimeToSleepEachLoop", 0.001),
-                                ("MotorType_StringList", ["XC330"]*len(DynamixelProtocol2Xseries_TestChannelsList)), #EACH INPUT LIST MUST BE THE SAME LENGTH AS NUMBER OF MOTORS.
+                                ("MainThread_TimeToSleepEachLoop", 0.002),
+                                ("MotorType_StringList", ["XC330-288-T"]*len(DynamixelProtocol2Xseries_TestChannelsList)), #EACH INPUT LIST MUST BE THE SAME LENGTH AS NUMBER OF MOTORS.
                                 ("MotorName_StringList", ["Large", "Small"]),
                                 ("ControlType_StartingValueList", ["ExtendedPositionControlMultiTurn"]*len(DynamixelProtocol2Xseries_TestChannelsList)), #MOTOR ID'S MUST BE IN ORDER FROM 0 T0 (NumberOfMotors - 1) (E.G. FOR 3 MOTORS, THE ID'S WOULD BE 0, 1, AND 2).
                                 ("Position_Deg_StartingValueList", [(SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_0 + SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_0)/2.0, (SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_1 + SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_1)/2.0]),
@@ -684,9 +684,9 @@ if __name__ == '__main__':
                                 ("Velocity_DynamixelUnits_StartingValueList", [0.0] * len(DynamixelProtocol2Xseries_TestChannelsList)),
                                 ("Velocity_DynamixelUnits_min", [0.0] * len(DynamixelProtocol2Xseries_TestChannelsList)),
                                 ("Velocity_DynamixelUnits_max", [60.0] * len(DynamixelProtocol2Xseries_TestChannelsList)),
-                                ("Current_Percent0to1_max", [1.0]*len(DynamixelProtocol2Xseries_TestChannelsList)),
-                                ("StartEngagedFlag", [1]*len(DynamixelProtocol2Xseries_TestChannelsList))])
-
+                                ("Current_DynamixelUnits_StartingValueList", [390.0] * len(DynamixelProtocol2Xseries_TestChannelsList)),
+                                ("StartEngagedFlag", [1]*len(DynamixelProtocol2Xseries_TestChannelsList)),
+                                ("ListOfVariableNameStringsToGet", ["PresentPosition", "PresentCurrent", "PresentInputVoltage", "PresentTemperature","CurrentLimit", "HardwareErrorStatus", "Shutdown"])])
 
     if USE_DynamixelProtocol2Xseries_FLAG == 1:
         try:
@@ -837,8 +837,8 @@ if __name__ == '__main__':
 
             if "Time" in DynamixelProtocol2Xseries_MostRecentDict:
                 try:
-                    DynamixelProtocol2Xseries_PresentPositionList = DynamixelProtocol2Xseries_MostRecentDict["PresentPosition"]
-                    #print("DynamixelProtocol2Xseries_PresentPositionList: " + str(DynamixelProtocol2Xseries_PresentPositionList))
+                    DynamixelProtocol2Xseries_PresentPositionDegreesList = DynamixelProtocol2Xseries_MostRecentDict["PresentPosition_Degrees"]
+                    #print("DynamixelProtocol2Xseries_PresentPositionDegreesList: " + str(DynamixelProtocol2Xseries_PresentPositionDegreesList))
                 except:
                     pass
 
@@ -895,7 +895,7 @@ if __name__ == '__main__':
 
                 if MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag == 1:
                     if CurrentTime_MainLoopThread - LastTime_MainLoopThread_PLOTTER >= 0.030:
-                        MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot(["Channel0"], [CurrentTime_MainLoopThread]*1, [DynamixelProtocol2Xseries_PresentPositionList[0]])
+                        MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot(["Channel0"], [CurrentTime_MainLoopThread]*1, [DynamixelProtocol2Xseries_PresentPositionDegreesList[0]])
                         LastTime_MainLoopThread_PLOTTER = CurrentTime_MainLoopThread
             ##########################################################################################################
 
@@ -904,7 +904,7 @@ if __name__ == '__main__':
 
         ##########################################################################################################
         ##########################################################################################################
-        time.sleep(0.002) ######## MUST HAVE AT LEAST A SMALL TIMEOUT OR ELSE THE MOTORS RUNS AWAY
+        time.sleep(0.005) ######## MUST HAVE AT LEAST A SMALL TIMEOUT OR ELSE THE MOTORS RUNS AWAY
         ##########################################################################################################
         ##########################################################################################################
 

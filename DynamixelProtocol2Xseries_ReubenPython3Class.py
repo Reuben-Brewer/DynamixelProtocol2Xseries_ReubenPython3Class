@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision H, 07/31/2024
+Software Revision I, 09/06/2024
 
 Verified working on: Python 3.11 for Windows 11 64-bit and Raspberry Pi Buster (no Mac testing yet).
 '''
@@ -3422,6 +3422,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
 
             ##############################################################################################
             ##############################################################################################
+            ##############################################################################################
 
             self.MostRecentDataDict["ControlType"] = self.ControlType
 
@@ -3444,15 +3445,27 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
             self.MostRecentDataDict["ErrorFlag_InputVoltage_Received"] = self.ErrorFlag_InputVoltage_Received
 
             ##############################################################################################
+            ##############################################################################################
             if "PresentPosition" in self.MostRecentDataDict:
                 for MotorIndex in range(0, self.NumberOfMotors):
+
+                    ##############################################################################################
+                    if "PresentPosition_Degrees" not in self.MostRecentDataDict:
+                        self.MostRecentDataDict["PresentPosition_Degrees"] = [0.0]*self.NumberOfMotors
+
+                    self.MostRecentDataDict["PresentPosition_Degrees"][MotorIndex] = self.ConversionFactorFromDynamixelUnitsToDegrees*self.MostRecentDataDict["PresentPosition"][MotorIndex]
+                    ##############################################################################################
+
+                    ##############################################################################################
                     if self.MostRecentDataDict["PresentPosition"][MotorIndex] == "error_serial_dxl_error":
                         self.ErrorFlag_SerialCommunication[MotorIndex] = 1
                     else:
                         self.ErrorFlag_SerialCommunication[MotorIndex] = 0
+                    ##############################################################################################
 
 
                 self.MostRecentDataDict["ErrorFlag_SerialCommunication"] = self.ErrorFlag_SerialCommunication
+            ##############################################################################################
             ##############################################################################################
 
             '''
@@ -3486,6 +3499,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
             self.MostRecentDataDict_ForExternalQueryAndGUIdisplayOnly = deepcopy(self.MostRecentDataDict)
 
             self.MostRecentDataDict_ForExternalQueryAndGUIdisplayOnly_BlockExternalCopyingFlag = 0
+            ##############################################################################################
             ##############################################################################################
             ##############################################################################################
 
@@ -3587,38 +3601,38 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
             #################################################
             self.LabelsFrame = Frame(self.myFrame)
             self.LabelsFrame["borderwidth"] = 2
-            self.LabelsFrame.grid(row=0, column=0, padx=1, pady=1, columnspan=1, rowspan=1)
+            self.LabelsFrame.grid(row=0, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
             #################################################
 
             #################################################
             self.DeviceInfoLabel = Label(self.LabelsFrame, text="Device Info", width=50)
-            self.DeviceInfoLabel.grid(row=0, column=0, padx=1, pady=1, columnspan=1, rowspan=1)
+            self.DeviceInfoLabel.grid(row=0, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
             #################################################
 
             #################################################
             self.DataLabel = Label(self.LabelsFrame, text="DataLabel", width=100)
-            self.DataLabel.grid(row=1, column=0, padx=1, pady=1, columnspan=1, rowspan=1)
+            self.DataLabel.grid(row=1, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
             #################################################
 
             #################################################
             self.ErrorLabel = Label(self.LabelsFrame, text="ErrorLabel", width=50)
-            self.ErrorLabel.grid(row=2, column=0, padx=1, pady=1, columnspan=5, rowspan=1)
+            self.ErrorLabel.grid(row=2, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=5, rowspan=1)
             #################################################
 
             #################################################
             self.ButtonsFrame = Frame(self.myFrame)
             self.ButtonsFrame["borderwidth"] = 2
-            self.ButtonsFrame.grid(row=1, column=0, padx=1, pady=1, columnspan=1, rowspan=1)
+            self.ButtonsFrame.grid(row=1, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
             #################################################
 
             #################################################
             self.DisengageAllMotorsButton = Button(self.ButtonsFrame, text="Disengage All Motors", state="normal", bg = "red", width=20,command=lambda i=1: self.DisengageAllMotorsButtonResponse())
-            self.DisengageAllMotorsButton.grid(row=0, column=0, padx=1, pady=1, columnspan=1, rowspan=1)
+            self.DisengageAllMotorsButton.grid(row=0, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
             #################################################
 
             #################################################
             self.EngageAllMotorsButton = Button(self.ButtonsFrame, text="Engage All Motors", state="normal", bg = "green", width=20,command=lambda i=1: self.EngageAllMotorsButtonResponse())
-            self.EngageAllMotorsButton.grid(row=0, column=1, padx=1, pady=1, columnspan=1, rowspan=1)
+            self.EngageAllMotorsButton.grid(row=0, column=1, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
             #################################################
 
             #################################################
@@ -3628,7 +3642,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
             #################################################
             self.ScalesFrame = Frame(self.myFrame)
             self.ScalesFrame["borderwidth"] = 2
-            self.ScalesFrame.grid(row=2, column=0, padx=1, pady=1, columnspan=1, rowspan=1)
+            self.ScalesFrame.grid(row=2, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
             #################################################
             
             self.Position_DynamixelUnits_ScaleLabel = []
@@ -3652,8 +3666,8 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
 
             for MotorIndex in range(0, self.NumberOfMotors):
                 #################################################
-                self.Position_DynamixelUnits_ScaleLabel.append(Label(self.ScalesFrame, text="Pos M" + str(MotorIndex) + "\n" + self.MotorName_StringList[MotorIndex], width=self.TkinterScaleWidth))
-                self.Position_DynamixelUnits_ScaleLabel[MotorIndex].grid(row=3 + MotorIndex*2, column=0, padx=1, pady=1, columnspan=1, rowspan=1)
+                self.Position_DynamixelUnits_ScaleLabel.append(Label(self.ScalesFrame, text="Pos (DU) M" + str(MotorIndex) + "\n" + self.MotorName_StringList[MotorIndex], width=self.TkinterScaleWidth))
+                self.Position_DynamixelUnits_ScaleLabel[MotorIndex].grid(row=3 + MotorIndex*2, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
 
                 self.Position_DynamixelUnits_ScaleValue.append(DoubleVar())
                 self.Position_DynamixelUnits_Scale.append(Scale(self.ScalesFrame,\
@@ -3671,12 +3685,12 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                 self.Position_DynamixelUnits_Scale[MotorIndex].bind('<B1-Motion>', lambda event, name=MotorIndex: self.Position_DynamixelUnits_ScaleResponse(event, name))
                 self.Position_DynamixelUnits_Scale[MotorIndex].bind('<ButtonRelease-1>', lambda event, name=MotorIndex: self.Position_DynamixelUnits_ScaleResponse(event, name))
                 self.Position_DynamixelUnits_Scale[MotorIndex].set(self.Position_DynamixelUnits_StartingValueList[MotorIndex])
-                self.Position_DynamixelUnits_Scale[MotorIndex].grid(row=3 + MotorIndex*2, column=1, padx=1, pady=1, columnspan=1, rowspan=1)
+                self.Position_DynamixelUnits_Scale[MotorIndex].grid(row=3 + MotorIndex*2, column=1, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
                 #################################################
 
                 #################################################
                 self.Velocity_DynamixelUnits_ScaleLabel.append(Label(self.ScalesFrame, text="Vel M" + str(MotorIndex) + "\n" + self.MotorName_StringList[MotorIndex], width=self.TkinterScaleWidth))
-                self.Velocity_DynamixelUnits_ScaleLabel[MotorIndex].grid(row=3 + MotorIndex*2, column=2, padx=1, pady=1, columnspan=1, rowspan=1)
+                self.Velocity_DynamixelUnits_ScaleLabel[MotorIndex].grid(row=3 + MotorIndex*2, column=2, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
 
                 self.Velocity_DynamixelUnits_ScaleValue.append(DoubleVar())
                 self.Velocity_DynamixelUnits_Scale.append(Scale(self.ScalesFrame,\
@@ -3693,12 +3707,12 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                 self.Velocity_DynamixelUnits_Scale[MotorIndex].bind('<B1-Motion>', lambda event, name=MotorIndex: self.Velocity_DynamixelUnits_ScaleResponse(event, name))
                 self.Velocity_DynamixelUnits_Scale[MotorIndex].bind('<ButtonRelease-1>', lambda event, name=MotorIndex: self.Velocity_DynamixelUnits_ScaleResponse(event, name))
                 self.Velocity_DynamixelUnits_Scale[MotorIndex].set(self.Velocity_DynamixelUnits_StartingValueList[MotorIndex])
-                self.Velocity_DynamixelUnits_Scale[MotorIndex].grid(row=3 + MotorIndex*2, column=3, padx=1, pady=1, columnspan=1, rowspan=1)
+                self.Velocity_DynamixelUnits_Scale[MotorIndex].grid(row=3 + MotorIndex*2, column=3, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
                 #################################################
 
                 #################################################
                 self.Current_DynamixelUnits_ScaleLabel.append(Label(self.ScalesFrame, text="Cur M" + str(MotorIndex) + "\n" + self.MotorName_StringList[MotorIndex], width=self.TkinterScaleWidth))
-                self.Current_DynamixelUnits_ScaleLabel[MotorIndex].grid(row=4 + MotorIndex*2, column=0, padx=1, pady=1, columnspan=1, rowspan=1)
+                self.Current_DynamixelUnits_ScaleLabel[MotorIndex].grid(row=4 + MotorIndex*2, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
 
                 self.Current_DynamixelUnits_ScaleValue.append(DoubleVar())
                 self.Current_DynamixelUnits_Scale.append(Scale(self.ScalesFrame, \
@@ -3716,12 +3730,12 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                 self.Current_DynamixelUnits_Scale[MotorIndex].bind('<B1-Motion>', lambda event, name=MotorIndex: self.Current_DynamixelUnits_ScaleResponse(event, name))
                 self.Current_DynamixelUnits_Scale[MotorIndex].bind('<ButtonRelease-1>', lambda event, name=MotorIndex: self.Current_DynamixelUnits_ScaleResponse(event, name))
                 self.Current_DynamixelUnits_Scale[MotorIndex].set(self.Current_DynamixelUnits_StartingValueList[MotorIndex])
-                self.Current_DynamixelUnits_Scale[MotorIndex].grid(row=4 + MotorIndex*2, column=1, padx=1, pady=1, columnspan=1, rowspan=1)
+                self.Current_DynamixelUnits_Scale[MotorIndex].grid(row=4 + MotorIndex*2, column=1, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
                 #################################################
 
                 #################################################
                 self.PWM_DynamixelUnits_ScaleLabel.append(Label(self.ScalesFrame, text="PWM M" + str(MotorIndex) + "\n" + self.MotorName_StringList[MotorIndex], width=self.TkinterScaleWidth))
-                self.PWM_DynamixelUnits_ScaleLabel[MotorIndex].grid(row=4 + MotorIndex*2, column=2, padx=1, pady=1, columnspan=1, rowspan=1)
+                self.PWM_DynamixelUnits_ScaleLabel[MotorIndex].grid(row=4 + MotorIndex*2, column=2, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
 
                 self.PWM_DynamixelUnits_ScaleValue.append(DoubleVar())
                 self.PWM_DynamixelUnits_Scale.append(Scale(self.ScalesFrame, \
@@ -3739,7 +3753,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                 self.PWM_DynamixelUnits_Scale[MotorIndex].bind('<B1-Motion>', lambda event, name=MotorIndex: self.PWM_DynamixelUnits_ScaleResponse(event, name))
                 self.PWM_DynamixelUnits_Scale[MotorIndex].bind('<ButtonRelease-1>', lambda event, name=MotorIndex: self.PWM_DynamixelUnits_ScaleResponse(event, name))
                 self.PWM_DynamixelUnits_Scale[MotorIndex].set(self.PWM_DynamixelUnits_StartingValueList[MotorIndex])
-                self.PWM_DynamixelUnits_Scale[MotorIndex].grid(row=4 + MotorIndex*2, column=3, padx=1, pady=1, columnspan=1, rowspan=1)
+                self.PWM_DynamixelUnits_Scale[MotorIndex].grid(row=4 + MotorIndex*2, column=3, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
                 #################################################
 
             #################################################
@@ -3753,7 +3767,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
             #################################################
             self.IndividualMotorWidgetsFrame = Frame(self.myFrame)
             self.IndividualMotorWidgetsFrame["borderwidth"] = 2
-            self.IndividualMotorWidgetsFrame.grid(row=3, column=0, padx=1, pady=1, columnspan=1, rowspan=1)
+            self.IndividualMotorWidgetsFrame.grid(row=3, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
             #################################################
 
             self.EngagedState_Checkbutton = []
@@ -3776,35 +3790,39 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
 
             self.TkinterScaleWidth = 10
             self.TkinterScaleLength = 200
+            
+            self.TkinterButtonWidth = 15
+            self.TkinterCheckbuttonWidth = 20
+            self.TkinterControlTypeRadiobuttonWidth = 25
 
             for MotorIndex in range(0, self.NumberOfMotors):
             #################################################
 
                 ###########################################################
                 self.ToggleMinMax_Button.append(Button(self.IndividualMotorWidgetsFrame,
-                                                width=15,
+                                                width=self.TkinterButtonWidth,
                                                 text='ToggleMinMax M' + str(MotorIndex),
                                                 state="normal"))
                 self.ToggleMinMax_Button[MotorIndex].bind('<ButtonRelease-1>', lambda event, name=MotorIndex: self.ToggleMinMax_ButtonResponse(event, name))
-                self.ToggleMinMax_Button[MotorIndex].grid(row=3 + MotorIndex*2, column=5, padx=1, pady=10, columnspan=1, rowspan=1)
+                self.ToggleMinMax_Button[MotorIndex].grid(row=3 + MotorIndex*2, column=5, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
                 ###########################################################
 
                 ###########################################################
                 self.ResetSerial_Button.append(Button(self.IndividualMotorWidgetsFrame,
-                                                width=15,
+                                                width=self.TkinterButtonWidth,
                                                 text='ResetSerial M' + str(MotorIndex),
                                                 state="normal"))
                 self.ResetSerial_Button[MotorIndex].bind('<ButtonRelease-1>', lambda event, name=MotorIndex: self.ResetSerial_ButtonResponse(event, name))
-                self.ResetSerial_Button[MotorIndex].grid(row=3 + MotorIndex*2, column=6, padx=1, pady=10, columnspan=1, rowspan=1)
+                self.ResetSerial_Button[MotorIndex].grid(row=3 + MotorIndex*2, column=6, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
                 ###########################################################
 
                 ###########################################################
                 self.Reboot_Button.append(Button(self.IndividualMotorWidgetsFrame,
-                                                width=15,
+                                                width=self.TkinterButtonWidth,
                                                 text='Reboot M' + str(MotorIndex),
                                                 state="normal"))
                 self.Reboot_Button[MotorIndex].bind('<ButtonRelease-1>', lambda event, name=MotorIndex: self.Reboot_ButtonResponse(event, name))
-                self.Reboot_Button[MotorIndex].grid(row=3 + MotorIndex*2, column=7, padx=1, pady=10, columnspan=1, rowspan=1)
+                self.Reboot_Button[MotorIndex].grid(row=3 + MotorIndex*2, column=7, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
                 ###########################################################
 
                 ###########################################################
@@ -3816,24 +3834,24 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                     self.EngagedState_Checkbutton_Value[MotorIndex].set(0)
 
                 self.EngagedState_Checkbutton.append(Checkbutton(self.IndividualMotorWidgetsFrame,
-                                                                width=15,
+                                                                width=self.TkinterCheckbuttonWidth,
                                                                 text='Engage M' + str(MotorIndex),
                                                                 state="normal",
                                                                 variable=self.EngagedState_Checkbutton_Value[MotorIndex]))
                 self.EngagedState_Checkbutton[MotorIndex].bind('<ButtonRelease-1>', lambda event, name=MotorIndex: self.EngagedState_CheckbuttonResponse(event, name))
-                self.EngagedState_Checkbutton[MotorIndex].grid(row=3 + MotorIndex*2, column=8, padx=10, pady=1, columnspan=1, rowspan=1)
+                self.EngagedState_Checkbutton[MotorIndex].grid(row=3 + MotorIndex*2, column=8, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
                 ###########################################################
 
                 ###########################################################
                 self.LEDstate_Checkbutton_Value.append(DoubleVar())
                 self.LEDstate_Checkbutton_Value[MotorIndex].set(0)
                 self.LEDstate_Checkbutton.append(Checkbutton(self.IndividualMotorWidgetsFrame,
-                                                                width=15,
+                                                                width=self.TkinterCheckbuttonWidth,
                                                                 text='LED M' + str(MotorIndex),
                                                                 state="normal",
                                                                 variable=self.LEDstate_Checkbutton_Value[MotorIndex]))
                 self.LEDstate_Checkbutton[MotorIndex].bind('<ButtonRelease-1>', lambda event, name=MotorIndex: self.LEDstate_CheckbuttonResponse(event, name))
-                self.LEDstate_Checkbutton[MotorIndex].grid(row=3 + MotorIndex*2, column=9, padx=1, pady=10, columnspan=1, rowspan=1)
+                self.LEDstate_Checkbutton[MotorIndex].grid(row=3 + MotorIndex*2, column=9, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
                 ###########################################################
 
                 ###########################################################
@@ -3844,12 +3862,12 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                 self.ControlTypeRadiobutton_CurrentControl.append(Radiobutton(self.IndividualMotorWidgetsFrame,
                                                               text="CurrentControl",
                                                               state="normal",
-                                                              width=15,
+                                                              width=self.TkinterControlTypeRadiobuttonWidth,
                                                               anchor="w",
                                                               variable=self.ControlTypeRadiobutton_SelectionVar[MotorIndex],
                                                               value="CurrentControl",
                                                               command=lambda name=MotorIndex: self.ControlTypeRadiobutton_Response(name)))
-                self.ControlTypeRadiobutton_CurrentControl[MotorIndex].grid(row=4 + MotorIndex*2, column=5, padx=1, pady=10, columnspan=1, rowspan=1)
+                self.ControlTypeRadiobutton_CurrentControl[MotorIndex].grid(row=4 + MotorIndex*2, column=5, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
                 if self.ControlType_StartingValueList[MotorIndex] == "CurrentControl":
                     self.ControlTypeRadiobutton_CurrentControl[MotorIndex].select()
                     #self.ControlTypeRadiobutton_CurrentControl[MotorIndex].invoke()
@@ -3859,12 +3877,12 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                 self.ControlTypeRadiobutton_VelocityControl.append(Radiobutton(self.IndividualMotorWidgetsFrame,
                                                               text="VelocityControl",
                                                               state="normal",
-                                                              width=15,
+                                                              width=self.TkinterControlTypeRadiobuttonWidth,
                                                               anchor="w",
                                                               variable=self.ControlTypeRadiobutton_SelectionVar[MotorIndex],
                                                               value="VelocityControl",
                                                               command=lambda name=MotorIndex: self.ControlTypeRadiobutton_Response(name)))
-                self.ControlTypeRadiobutton_VelocityControl[MotorIndex].grid(row=4 + MotorIndex*2, column=6, padx=1, pady=10, columnspan=1, rowspan=1)
+                self.ControlTypeRadiobutton_VelocityControl[MotorIndex].grid(row=4 + MotorIndex*2, column=6, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
                 if self.ControlType_StartingValueList[MotorIndex] == "VelocityControl":
                     self.ControlTypeRadiobutton_VelocityControl[MotorIndex].select()
                     #self.ControlTypeRadiobutton_VelocityControl[MotorIndex].invoke()
@@ -3874,12 +3892,12 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                 self.ControlTypeRadiobutton_PositionControl.append(Radiobutton(self.IndividualMotorWidgetsFrame,
                                                               text="PositionControl",
                                                               state="normal",
-                                                              width=15,
+                                                              width=self.TkinterControlTypeRadiobuttonWidth,
                                                               anchor="w",
                                                               variable=self.ControlTypeRadiobutton_SelectionVar[MotorIndex],
                                                               value="PositionControl",
                                                               command=lambda name=MotorIndex: self.ControlTypeRadiobutton_Response(name)))
-                self.ControlTypeRadiobutton_PositionControl[MotorIndex].grid(row=4 + MotorIndex*2, column=7, padx=1, pady=10, columnspan=1, rowspan=1)
+                self.ControlTypeRadiobutton_PositionControl[MotorIndex].grid(row=4 + MotorIndex*2, column=7, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
                 if self.ControlType_StartingValueList[MotorIndex] == "PositionControl":
                     self.ControlTypeRadiobutton_PositionControl[MotorIndex].select()
                     #self.ControlTypeRadiobutton_PositionControl[MotorIndex].invoke()
@@ -3889,12 +3907,12 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                 self.ControlTypeRadiobutton_ExtendedPositionControlMultiTurn.append(Radiobutton(self.IndividualMotorWidgetsFrame,
                                                               text="ExtendedPositionControlMultiTurn",
                                                               state="normal",
-                                                              width=15,
+                                                              width=self.TkinterControlTypeRadiobuttonWidth,
                                                               anchor="w",
                                                               variable=self.ControlTypeRadiobutton_SelectionVar[MotorIndex],
                                                               value="ExtendedPositionControlMultiTurn",
                                                               command=lambda name=MotorIndex: self.ControlTypeRadiobutton_Response(name)))
-                self.ControlTypeRadiobutton_ExtendedPositionControlMultiTurn[MotorIndex].grid(row=4 + MotorIndex*2, column=8, padx=1, pady=10, columnspan=1, rowspan=1)
+                self.ControlTypeRadiobutton_ExtendedPositionControlMultiTurn[MotorIndex].grid(row=4 + MotorIndex*2, column=8, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
                 if self.ControlType_StartingValueList[MotorIndex] == "ExtendedPositionControlMultiTurn":
                     self.ControlTypeRadiobutton_ExtendedPositionControlMultiTurn[MotorIndex].select()
                     #self.ControlTypeRadiobutton_ExtendedPositionControlMultiTurn[MotorIndex].invoke()
@@ -3904,12 +3922,12 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                 self.ControlTypeRadiobutton_CurrentBasedPositionControl.append(Radiobutton(self.IndividualMotorWidgetsFrame,
                                                               text="CurrentBasedPositionControl",
                                                               state="normal",
-                                                              width=15,
+                                                              width=self.TkinterControlTypeRadiobuttonWidth,
                                                               anchor="w",
                                                               variable=self.ControlTypeRadiobutton_SelectionVar[MotorIndex],
                                                               value="CurrentBasedPositionControl",
                                                               command=lambda name=MotorIndex: self.ControlTypeRadiobutton_Response(name)))
-                self.ControlTypeRadiobutton_CurrentBasedPositionControl[MotorIndex].grid(row=4 + MotorIndex*2, column=9, padx=1, pady=10, columnspan=1, rowspan=1)
+                self.ControlTypeRadiobutton_CurrentBasedPositionControl[MotorIndex].grid(row=4 + MotorIndex*2, column=9, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
                 if self.ControlType_StartingValueList[MotorIndex] == "CurrentBasedPositionControl":
                     self.ControlTypeRadiobutton_CurrentBasedPositionControl[MotorIndex].select()
                     #self.ControlTypeRadiobutton_CurrentBasedPositionControl[MotorIndex].invoke()
@@ -3919,12 +3937,12 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                 self.ControlTypeRadiobutton_PWMcontrol.append(Radiobutton(self.IndividualMotorWidgetsFrame,
                                                               text="PWMcontrol",
                                                               state="normal",
-                                                              width=15,
+                                                              width=self.TkinterControlTypeRadiobuttonWidth,
                                                               anchor="w",
                                                               variable=self.ControlTypeRadiobutton_SelectionVar[MotorIndex],
                                                               value="PWMcontrol",
                                                               command=lambda name=MotorIndex: self.ControlTypeRadiobutton_Response(name)))
-                self.ControlTypeRadiobutton_PWMcontrol[MotorIndex].grid(row=4 + MotorIndex*2, column=10, padx=1, pady=1, columnspan=10, rowspan=1)
+                self.ControlTypeRadiobutton_PWMcontrol[MotorIndex].grid(row=4 + MotorIndex*2, column=10, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=10, rowspan=1)
                 if self.ControlType_StartingValueList[MotorIndex] == "PWMcontrol":
                     self.ControlTypeRadiobutton_PWMcontrol[MotorIndex].select()
                     #self.ControlTypeRadiobutton_PWMcontrol[MotorIndex].invoke()
