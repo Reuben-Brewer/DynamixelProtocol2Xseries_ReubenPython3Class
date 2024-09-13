@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision J, 09/06/2024
+Software Revision K, 09/12/2024
 
 Verified working on: Python 3.11 for Windows 11 64-bit and Raspberry Pi Buster (no Mac testing yet).
 '''
@@ -465,7 +465,7 @@ if __name__ == '__main__':
     USE_PLOTTER_FLAG = 1
 
     global USE_SINUSOIDAL_POS_CONTROL_INPUT_FLAG
-    USE_SINUSOIDAL_POS_CONTROL_INPUT_FLAG = 1 #unicorn
+    USE_SINUSOIDAL_POS_CONTROL_INPUT_FLAG = 0 #unicorn
     ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
@@ -557,13 +557,13 @@ if __name__ == '__main__':
     SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_0 = -400.0
 
     global SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_0
-    SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_0 = 400.0
+    SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_0 = 800.0
 
     global SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_1
-    SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_1 = -500.0
+    SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_1 = -400.0
 
     global SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_1
-    SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_1 = 500.0
+    SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_1 = 800.0
 
     global SINUSOIDAL_MOTION_INPUT_MinValue_VelocityControl
     SINUSOIDAL_MOTION_INPUT_MinValue_VelocityControl = -1.0
@@ -678,14 +678,14 @@ if __name__ == '__main__':
                                 ("MotorType_StringList", ["XC330-288-T"]*len(DynamixelProtocol2Xseries_TestChannelsList)), #EACH INPUT LIST MUST BE THE SAME LENGTH AS NUMBER OF MOTORS. XC330-288-T
                                 ("MotorName_StringList", ["Large", "Small"]),
                                 ("ControlType_StartingValueList", ["ExtendedPositionControlMultiTurn"]*len(DynamixelProtocol2Xseries_TestChannelsList)), #MOTOR ID'S MUST BE IN ORDER FROM 0 T0 (NumberOfMotors - 1) (E.G. FOR 3 MOTORS, THE ID'S WOULD BE 0, 1, AND 2).
-                                ("Position_Deg_StartingValueList", [(SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_0 + SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_0)/2.0, (SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_1 + SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_1)/2.0]),
+                                ("Position_Deg_StartingValueList", [123.0, 456.0]),#[(SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_0 + SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_0)/2.0, (SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_1 + SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_1)/2.0]),
                                 ("Position_Deg_min", [SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_0, SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_1]),
                                 ("Position_Deg_max", [SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_0, SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_1]),
                                 ("Velocity_DynamixelUnits_StartingValueList", [0.0] * len(DynamixelProtocol2Xseries_TestChannelsList)),
                                 ("Velocity_DynamixelUnits_min", [0.0] * len(DynamixelProtocol2Xseries_TestChannelsList)),
                                 ("Velocity_DynamixelUnits_max", [60.0] * len(DynamixelProtocol2Xseries_TestChannelsList)),
                                 ("Current_DynamixelUnits_StartingValueList", [390.0] * len(DynamixelProtocol2Xseries_TestChannelsList)),
-                                ("StartEngagedFlag", [1]*len(DynamixelProtocol2Xseries_TestChannelsList)),
+                                ("StartEngagedFlag", [0]*len(DynamixelProtocol2Xseries_TestChannelsList)),
                                 ("ListOfVariableNameStringsToGet", ["PresentPosition", "PresentCurrent", "PresentInputVoltage", "PresentTemperature","CurrentLimit", "HardwareErrorStatus", "Shutdown"])])
 
     if USE_DynamixelProtocol2Xseries_FLAG == 1:
@@ -818,7 +818,7 @@ if __name__ == '__main__':
     print("Starting main loop 'test_program_for_DynamixelProtocol1AXorMXseries.py'")
 
     StartingTime_MainLoopThread = getPreciseSecondsTimeStampString()
-    LED_ToggleCounter = 0
+    LoopCounter = 0
 
     while(EXIT_PROGRAM_FLAG == 0):
 
@@ -857,6 +857,12 @@ if __name__ == '__main__':
         if USE_DynamixelProtocol2Xseries_FLAG == 1:
 
             time_gain = math.pi / (2.0 * SINUSOIDAL_MOTION_INPUT_ROMtestTimeToPeakAngle)
+
+            if LoopCounter == 500:
+                for DynamixelChannel in range(0, len(DynamixelProtocol2Xseries_TestChannelsList)):
+                    if DynamixelChannel in DynamixelProtocol2Xseries_TestChannelsList:
+                        DynamixelProtocol2Xseries_Object.SetEngagedState_FROM_EXTERNAL_PROGRAM(DynamixelChannel, 1)
+                        print("Motor " + str(DynamixelChannel) + "engaged!")
 
             if USE_SINUSOIDAL_POS_CONTROL_INPUT_FLAG == 1:
 
@@ -904,6 +910,7 @@ if __name__ == '__main__':
 
         ##########################################################################################################
         ##########################################################################################################
+        LoopCounter = LoopCounter + 1
         time.sleep(0.005) ######## MUST HAVE AT LEAST A SMALL TIMEOUT OR ELSE THE MOTORS RUNS AWAY
         ##########################################################################################################
         ##########################################################################################################
