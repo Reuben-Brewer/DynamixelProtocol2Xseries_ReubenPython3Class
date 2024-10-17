@@ -12,12 +12,16 @@ www.reubotics.com
 
 Apache 2 License
 
-Software Revision K, 09/12/2024
+Software Revision L, 10/17/2024
 
 Verified working on:
-Python 3.11.
-Windows 11 64-bit
+
+Python 3.12.
+
+Windows 10, 11 64-bit
+
 Raspberry Pi Buster
+
 (no Mac testing yet)
 
 This code works ONLY for Dynamixel's Protocol 2 (X series and possibly some other series).
@@ -59,6 +63,7 @@ DynamixelProtocol2Xseries_ReubenPython3Class, ListOfModuleDependencies_All:['dyn
 ###
 
 Windows and Raspberry Pi:
+
 pip install pyserial
 
 ###
@@ -67,13 +72,15 @@ pip install pyserial
 
 http://emanual.robotis.com/docs/en/software/dynamixel/dynamixel_sdk/library_setup/python_windows/#building-the-library
 
-#Must install manually from .\DynamixelSDK-3.7.21\python using "sudo python setup.py install".
-NOTE THAT IN YOU MUST ISSUE THIS COMMAND FROM A TERMINAL WITHIN THIS FOLDER OR ELSE IT WILL FAIL (THE SETUP.PY HAS TO BE A LOCAL FILE WITHIN THAT FOLDER, NOT HAVE A LONG PATH TO IT).
+Install via "pip install dynamixel_sdk".
 
-Note that "pip show dynamixel_sdk" says it's version 3.6.0, but it's actually 3.7.21.
-Note also that Reuben modified some code in "port_handler.py" before installation (the default baud and latency_timer).
+On 10/17/24, used version dynamixel_sdk-3.7.31, installed to C:\Anaconda3\Lib\site-packages\dynamixel_sdk
 
-To test the installation, make sure that "import dynamixel_sdk" succeeds within Python.
+Note also that Reuben modified some code in "port_handler.py" after installation.
+
+LATENCY_TIMER = 1
+
+DEFAULT_BAUDRATE = 4000000
 
 ###
 
@@ -84,15 +91,21 @@ Set USB-Serial latency_timer
 In Windows:
 
 Manual method:
+
 Follow the instructions in the included image "LatencyTimer_SetManuallyInWindows.png".
 
 Automated method:
+
 python LatencyTimer_DynamixelU2D2_ReadAndWrite_Windows.py
 
 In Linux (including Raspberry Pi):
+
 Run the included script:
+
 sudo dos2unix LatencyTimer_Set_LinuxScript.sh
+
 sudo chmod 777 LatencyTimer_Set_LinuxScript.sh
+
 sudo ./LatencyTimer_Set_LinuxScript.sh 1
 
 ###
@@ -100,6 +113,7 @@ sudo ./LatencyTimer_Set_LinuxScript.sh 1
 ###ftd2xx
 
 Windows:
+
 If the required driver is already on your Windows machine, then it will be installed automatically when the U2D2 is first plugged-in (note that this installation will occur separately for EACH separate USB port, and that the latency_timer will need to be set for EACH separate USB port.
 However, if you don't see a new USB-Serial device appearing with a new "COM" number in Device Manger after Windows says it's done installing your new device, then you'll need to install the driver separately using Windows_FTDI_USBserial_driver_061020-->CDM21228_Setup.exe
 
@@ -118,26 +132,39 @@ sudo pip3 install ftd2xx==1.0
 sudo gedit /usr/local/lib/python3.7/dist-packages/ftd2xx/ftd2xx.py
 
 Add the lines:
+
 "elif sys.platform == 'linux':
     
 	from . import _ftd2xx_linux as _ft"
+
 right before the linux2 line (otherwise it breaks when run in Python 3).
+
 Alternatively, you can copy Reuben's version of this file (ftd2xx_ReubenModified.py) to /usr/local/lib/python3.7/dist-packages/ftd2xx/ftd2xx.py.
 
 #######
 
 To install the driver:
+
 Download the 1.4.6 ARMv6 hard-float (suits Raspberry Pi) source code from ftdi (http://www.ftdichip.com/Drivers/D2XX.htm) or use the included file. 
+
 Install following these instructions (modified from the readme that comes with the driver):
 
-tar --extract --file libftd2xx-arm-v6-hf-1.4.6.tgz 
+tar --extract --file libftd2xx-arm-v6-hf-1.4.6.tgz
+
 cd release
+
 cd build
+
 sudo -s (become root)
+
 cp libftd2xx.* /usr/local/lib
+
 chmod 0755 /usr/local/lib/libftd2xx.so.1.4.6
+
 ln -sf /usr/local/lib/libftd2xx.so.1.4.6 /usr/local/lib/libftd2xx.so
+
 exit
+
 THIS LAST STEP ISN'T IN THE READ ME BUT IS CRITICAL: 'sudo ldconfig' so that your code can find the new library.
 
 ###
