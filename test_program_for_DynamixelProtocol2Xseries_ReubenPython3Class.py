@@ -6,17 +6,17 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision K, 09/12/2024
+Software Revision L, 10/17/2024
 
-Verified working on: Python 3.11 for Windows 11 64-bit and Raspberry Pi Buster (no Mac testing yet).
+Verified working on: Python 3.12 for Windows 11 64-bit and Raspberry Pi Buster (no Mac testing yet).
 '''
 
 __author__ = 'reuben.brewer'
 
 ##########################################
 from DynamixelProtocol2Xseries_ReubenPython3Class import *
-from MyPrint_ReubenPython2and3Class import *
 from MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class import *
+from MyPrint_ReubenPython2and3Class import *
 ##########################################
 
 ##########################################
@@ -299,7 +299,7 @@ def GUI_update_clock():
             ##########################################################################################################
 
             ##########################################################################################################
-            if MYPRINT_OPEN_FLAG == 1 and SHOW_IN_GUI_MYPRINT_FLAG == 1:
+            if MyPrint_OPEN_FLAG == 1 and SHOW_IN_GUI_MyPrint_FLAG == 1:
                 MyPrint_ReubenPython2and3ClassObject.GUI_update_clock()
             ##########################################################################################################
 
@@ -461,8 +461,8 @@ if __name__ == '__main__':
     global USE_MyPrint_FLAG
     USE_MyPrint_FLAG = 1
 
-    global USE_PLOTTER_FLAG
-    USE_PLOTTER_FLAG = 1
+    global USE_MyPlotterPureTkinterStandAloneProcess_FLAG
+    USE_MyPlotterPureTkinterStandAloneProcess_FLAG = 1
 
     global USE_SINUSOIDAL_POS_CONTROL_INPUT_FLAG
     USE_SINUSOIDAL_POS_CONTROL_INPUT_FLAG = 0 #unicorn
@@ -476,8 +476,8 @@ if __name__ == '__main__':
     global SHOW_IN_GUI_DynamixelProtocol2Xseries_FLAG
     SHOW_IN_GUI_DynamixelProtocol2Xseries_FLAG = 1
 
-    global SHOW_IN_GUI_MYPRINT_FLAG
-    SHOW_IN_GUI_MYPRINT_FLAG = 1
+    global SHOW_IN_GUI_MyPrint_FLAG
+    SHOW_IN_GUI_MyPrint_FLAG = 1
     ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
@@ -499,19 +499,19 @@ if __name__ == '__main__':
     GUI_ROWSPAN_DynamixelProtocol2Xseries = 1
     GUI_COLUMNSPAN_DynamixelProtocol2Xseries = 1
 
-    global GUI_ROW_MYPRINT
-    global GUI_COLUMN_MYPRINT
-    global GUI_PADX_MYPRINT
-    global GUI_PADY_MYPRINT
-    global GUI_ROWSPAN_MYPRINT
-    global GUI_COLUMNSPAN_MYPRINT
-    GUI_ROW_MYPRINT = 1
+    global GUI_ROW_MyPrint
+    global GUI_COLUMN_MyPrint
+    global GUI_PADX_MyPrint
+    global GUI_PADY_MyPrint
+    global GUI_ROWSPAN_MyPrint
+    global GUI_COLUMNSPAN_MyPrint
+    GUI_ROW_MyPrint = 1
 
-    GUI_COLUMN_MYPRINT = 0
-    GUI_PADX_MYPRINT = 1
-    GUI_PADY_MYPRINT = 1
-    GUI_ROWSPAN_MYPRINT = 1
-    GUI_COLUMNSPAN_MYPRINT = 1
+    GUI_COLUMN_MyPrint = 0
+    GUI_PADX_MyPrint = 1
+    GUI_PADY_MyPrint = 1
+    GUI_ROWSPAN_MyPrint = 1
+    GUI_COLUMNSPAN_MyPrint = 1
     ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
@@ -554,16 +554,16 @@ if __name__ == '__main__':
     SINUSOIDAL_MOTION_INPUT_ROMtestTimeToPeakAngle = 3.0
 
     global SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_0  # unicorn
-    SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_0 = -400.0
+    SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_0 = 0.0
 
     global SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_0
-    SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_0 = 800.0
+    SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_0 = 400.0
 
     global SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_1
-    SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_1 = -400.0
+    SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_1 = 0.0
 
     global SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_1
-    SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_1 = 800.0
+    SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_1 = 400.0
 
     global SINUSOIDAL_MOTION_INPUT_MinValue_VelocityControl
     SINUSOIDAL_MOTION_INPUT_MinValue_VelocityControl = -1.0
@@ -586,16 +586,41 @@ if __name__ == '__main__':
     DynamixelProtocol2Xseries_TestChannelsList = [0, 1] #Set this list to whichever motor ID's you want to test.
 
     global DynamixelProtocol2Xseries_SinusoidalMotionChannelsList
-    DynamixelProtocol2Xseries_SinusoidalMotionChannelsList = [0, 1],
+    DynamixelProtocol2Xseries_SinusoidalMotionChannelsList = [0]
 
     global DynamixelProtocol2Xseries_MostRecentDict
     DynamixelProtocol2Xseries_MostRecentDict = dict()
 
-    global DynamixelProtocol2Xseries_PresentPositionDegreesList
-    DynamixelProtocol2Xseries_PresentPositionDegreesList = [0.0 ,0.0]
+    global DynamixelProtocol2Xseries_MostRecentDict_Time
+    DynamixelProtocol2Xseries_MostRecentDict_Time = [0.0]*len(DynamixelProtocol2Xseries_TestChannelsList)
 
-    global DynamixelProtocol2Xseries_PresentCurrentList
-    DynamixelProtocol2Xseries_PresentCurrentList = [0.0 ,0.0]
+    global DynamixelProtocol2Xseries_MostRecentDict_PresentPositionDegreesList
+    DynamixelProtocol2Xseries_MostRecentDict_PresentPositionDegreesList = [0.0]*len(DynamixelProtocol2Xseries_TestChannelsList)
+
+    global DynamixelProtocol2Xseries_MostRecentDict_PresentCurrentList
+    DynamixelProtocol2Xseries_MostRecentDict_PresentCurrentList = [0.0]*len(DynamixelProtocol2Xseries_TestChannelsList)
+
+    global DynamixelProtocol2Xseries_MostRecentDict_ErrorFlag_Overload_Received
+    DynamixelProtocol2Xseries_MostRecentDict_ErrorFlag_Overload_Received = [0.0]*len(DynamixelProtocol2Xseries_TestChannelsList)
+    
+    global DynamixelProtocol2Xseries_MostRecentDict_ErrorFlag_ElectricalShock_Received
+    DynamixelProtocol2Xseries_MostRecentDict_ErrorFlag_ElectricalShock_Received = [0.0]*len(DynamixelProtocol2Xseries_TestChannelsList)
+    
+    global DynamixelProtocol2Xseries_MostRecentDict_ErrorFlag_MotorEncoder_Received
+    DynamixelProtocol2Xseries_MostRecentDict_ErrorFlag_MotorEncoder_Received = [0.0]*len(DynamixelProtocol2Xseries_TestChannelsList)
+    
+    global DynamixelProtocol2Xseries_MostRecentDict_ErrorFlag_Overheating_Received
+    DynamixelProtocol2Xseries_MostRecentDict_ErrorFlag_Overheating_Received = [0.0]*len(DynamixelProtocol2Xseries_TestChannelsList)
+    
+    global DynamixelProtocol2Xseries_MostRecentDict_ErrorFlag_InputVoltage_Received
+    DynamixelProtocol2Xseries_MostRecentDict_ErrorFlag_InputVoltage_Received = [0.0]*len(DynamixelProtocol2Xseries_TestChannelsList)
+    
+    global DynamixelProtocol2Xseries_MostRecentDict_ErrorFlag_SerialCommunication
+    DynamixelProtocol2Xseries_MostRecentDict_ErrorFlag_SerialCommunication = [0.0]*len(DynamixelProtocol2Xseries_TestChannelsList)
+    
+    global DynamixelProtocol2Xseries_MostRecentDict_ErrorFlag_OperatingModeMismatch
+    DynamixelProtocol2Xseries_MostRecentDict_ErrorFlag_OperatingModeMismatch = [0.0]*len(DynamixelProtocol2Xseries_TestChannelsList)
+    
     ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
@@ -605,8 +630,8 @@ if __name__ == '__main__':
     ##########################################################################################################
     global MyPrint_ReubenPython2and3ClassObject
 
-    global MYPRINT_OPEN_FLAG
-    MYPRINT_OPEN_FLAG = -1
+    global MyPrint_OPEN_FLAG
+    MyPrint_OPEN_FLAG = -1
     ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
@@ -616,8 +641,8 @@ if __name__ == '__main__':
     ##########################################################################################################
     global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject
 
-    global PLOTTER_OPEN_FLAG
-    PLOTTER_OPEN_FLAG = -1
+    global MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG
+    MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG = -1
 
     global MyPlotterPureTkinter_MostRecentDict
     MyPlotterPureTkinter_MostRecentDict = dict()
@@ -667,7 +692,7 @@ if __name__ == '__main__':
 
     global DynamixelProtocol2Xseries_setup_dict
     DynamixelProtocol2Xseries_setup_dict = dict([("GUIparametersDict", DynamixelProtocol2Xseries_GUIparametersDict),
-                                ("DesiredSerialNumber_USBtoSerialConverter", "FT94VSKV"), #Change to the serial number of your unique device, FT89FE7OA FT891KTUA
+                                ("DesiredSerialNumber_USBtoSerialConverter", "FT94VSKV"), #Change to the serial number of your unique device
                                 ("NameToDisplay_UserSet", "Example Name U2D2"),
                                 ("SerialBaudRate", 4000000),
                                 ("WatchdogTimeIntervalMilliseconds", 100.0),
@@ -676,16 +701,16 @@ if __name__ == '__main__':
                                 ("ENABLE_SETS", 1),
                                 ("MainThread_TimeToSleepEachLoop", 0.002),
                                 ("MotorType_StringList", ["XC330-288-T"]*len(DynamixelProtocol2Xseries_TestChannelsList)), #EACH INPUT LIST MUST BE THE SAME LENGTH AS NUMBER OF MOTORS. XC330-288-T
-                                ("MotorName_StringList", ["Large", "Small"]),
-                                ("ControlType_StartingValueList", ["ExtendedPositionControlMultiTurn"]*len(DynamixelProtocol2Xseries_TestChannelsList)), #MOTOR ID'S MUST BE IN ORDER FROM 0 T0 (NumberOfMotors - 1) (E.G. FOR 3 MOTORS, THE ID'S WOULD BE 0, 1, AND 2).
-                                ("Position_Deg_StartingValueList", [123.0, 456.0]),#[(SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_0 + SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_0)/2.0, (SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_1 + SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_1)/2.0]),
-                                ("Position_Deg_min", [SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_0, SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_1]),
-                                ("Position_Deg_max", [SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_0, SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_1]),
-                                ("Velocity_DynamixelUnits_StartingValueList", [0.0] * len(DynamixelProtocol2Xseries_TestChannelsList)),
-                                ("Velocity_DynamixelUnits_min", [0.0] * len(DynamixelProtocol2Xseries_TestChannelsList)),
-                                ("Velocity_DynamixelUnits_max", [60.0] * len(DynamixelProtocol2Xseries_TestChannelsList)),
+                                ("MotorName_StringList", ["M0", "M1"]),
+                                ("OperatingMode_StartingValueList", ["CurrentBasedPositionControl"]*len(DynamixelProtocol2Xseries_TestChannelsList)), #MOTOR ID'S MUST BE IN ORDER FROM 0 T0 (NumberOfMotors - 1) (E.G. FOR 3 MOTORS, THE ID'S WOULD BE 0, 1, AND 2).
+                                ("Position_Deg_StartingValueList", [123.0, 359.0]),#[(SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_0 + SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_0)/2.0, (SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_1 + SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_1)/2.0]),
+                                ("Position_Deg_Min_UserSet", [SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_0, SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_1]),
+                                ("Position_Deg_Max_UserSet", [SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_0, SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_1]),
+                                ("Velocity_DynamixelUnits_StartingValueList", [50.0] * len(DynamixelProtocol2Xseries_TestChannelsList)),
+                                ("Velocity_DynamixelUnits_Min_UserSet", [1.0] * len(DynamixelProtocol2Xseries_TestChannelsList)),
+                                ("Velocity_DynamixelUnits_Max_UserSet", [150.0] * len(DynamixelProtocol2Xseries_TestChannelsList)),
                                 ("Current_DynamixelUnits_StartingValueList", [390.0] * len(DynamixelProtocol2Xseries_TestChannelsList)),
-                                ("StartEngagedFlag", [0]*len(DynamixelProtocol2Xseries_TestChannelsList)),
+                                ("StartEngagedFlag", [1]*len(DynamixelProtocol2Xseries_TestChannelsList)),
                                 ("ListOfVariableNameStringsToGet", ["PresentPosition", "PresentCurrent", "PresentInputVoltage", "PresentTemperature","CurrentLimit", "HardwareErrorStatus", "Shutdown"])])
 
     if USE_DynamixelProtocol2Xseries_FLAG == 1:
@@ -706,15 +731,15 @@ if __name__ == '__main__':
     ##########################################################################################################
     if USE_MyPrint_FLAG == 1:
 
-        MyPrint_ReubenPython2and3ClassObject_GUIparametersDict = dict([("USE_GUI_FLAG", USE_GUI_FLAG and SHOW_IN_GUI_MYPRINT_FLAG),
+        MyPrint_ReubenPython2and3ClassObject_GUIparametersDict = dict([("USE_GUI_FLAG", USE_GUI_FLAG and SHOW_IN_GUI_MyPrint_FLAG),
                                                                         ("root", Tab_MyPrint),
                                                                         ("UseBorderAroundThisGuiObjectFlag", 0),
-                                                                        ("GUI_ROW", GUI_ROW_MYPRINT),
-                                                                        ("GUI_COLUMN", GUI_COLUMN_MYPRINT),
-                                                                        ("GUI_PADX", GUI_PADX_MYPRINT),
-                                                                        ("GUI_PADY", GUI_PADY_MYPRINT),
-                                                                        ("GUI_ROWSPAN", GUI_ROWSPAN_MYPRINT),
-                                                                        ("GUI_COLUMNSPAN", GUI_COLUMNSPAN_MYPRINT)])
+                                                                        ("GUI_ROW", GUI_ROW_MyPrint),
+                                                                        ("GUI_COLUMN", GUI_COLUMN_MyPrint),
+                                                                        ("GUI_PADX", GUI_PADX_MyPrint),
+                                                                        ("GUI_PADY", GUI_PADY_MyPrint),
+                                                                        ("GUI_ROWSPAN", GUI_ROWSPAN_MyPrint),
+                                                                        ("GUI_COLUMNSPAN", GUI_COLUMNSPAN_MyPrint)])
 
         MyPrint_ReubenPython2and3ClassObject_setup_dict = dict([("NumberOfPrintLines", 10),
                                                                 ("WidthOfPrintingLabel", 200),
@@ -724,7 +749,7 @@ if __name__ == '__main__':
 
         try:
             MyPrint_ReubenPython2and3ClassObject = MyPrint_ReubenPython2and3Class(MyPrint_ReubenPython2and3ClassObject_setup_dict)
-            MYPRINT_OPEN_FLAG = MyPrint_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
+            MyPrint_OPEN_FLAG = MyPrint_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
 
         except:
             exceptions = sys.exc_info()[0]
@@ -750,7 +775,7 @@ if __name__ == '__main__':
     global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_setup_dict
     MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_setup_dict = dict([("GUIparametersDict", MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_GUIparametersDict),
                                                                                         ("ParentPID", os.getpid()),
-                                                                                        ("WatchdogTimerExpirationDurationSeconds_StandAlonePlottingProcess", 0.0),
+                                                                                        ("WatchdogTimerExpirationDurationSeconds_StandAlonePlottingProcess", 5.0),
                                                                                         ("MarkerSize", 3),
                                                                                         ("CurvesToPlotNamesAndColorsDictOfLists", dict([("NameList", ["Channel0", "Channel1", "Channel2", "Channel3"]),("ColorList", ["Red", "Green", "Blue", "Black"])])),
                                                                                         ("NumberOfDataPointToPlot", 100),
@@ -769,10 +794,10 @@ if __name__ == '__main__':
                                                                                         ("YaxisLabelString", "Y-units (units)"),
                                                                                         ("ShowLegendFlag", 1)])
 
-    if USE_PLOTTER_FLAG == 1:
+    if USE_MyPlotterPureTkinterStandAloneProcess_FLAG == 1:
         try:
             MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_setup_dict)
-            PLOTTER_OPEN_FLAG = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
+            MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
 
         except:
             exceptions = sys.exc_info()[0]
@@ -795,7 +820,7 @@ if __name__ == '__main__':
     ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
-    if USE_MyPrint_FLAG == 1 and MYPRINT_OPEN_FLAG != 1:
+    if USE_MyPrint_FLAG == 1 and MyPrint_OPEN_FLAG != 1:
         print("Failed to open MyPrint_ReubenPython2and3ClassObject.")
         ExitProgram_Callback()
     ##########################################################################################################
@@ -805,7 +830,7 @@ if __name__ == '__main__':
     ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
-    if USE_PLOTTER_FLAG == 1 and PLOTTER_OPEN_FLAG != 1:
+    if USE_MyPlotterPureTkinterStandAloneProcess_FLAG == 1 and MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG != 1:
         print("Failed to open MyPlotterPureTkinterClass_Object.")
         ExitProgram_Callback()
     ##########################################################################################################
@@ -836,18 +861,22 @@ if __name__ == '__main__':
             #print("DynamixelProtocol2Xseries_MostRecentDict: " + str(DynamixelProtocol2Xseries_MostRecentDict))
 
             if "Time" in DynamixelProtocol2Xseries_MostRecentDict:
-                try:
-                    DynamixelProtocol2Xseries_PresentPositionDegreesList = DynamixelProtocol2Xseries_MostRecentDict["PresentPosition_Degrees"]
-                    #print("DynamixelProtocol2Xseries_PresentPositionDegreesList: " + str(DynamixelProtocol2Xseries_PresentPositionDegreesList))
-                except:
-                    pass
+                DynamixelProtocol2Xseries_MostRecentDict_Time = DynamixelProtocol2Xseries_MostRecentDict["Time"]
 
-                try:
-                    DynamixelProtocol2Xseries_PresentCurrentList = DynamixelProtocol2Xseries_MostRecentDict["PresentCurrent"]
-                    #print("DynamixelProtocol2Xseries_PresentCurrentList: " + str(DynamixelProtocol2Xseries_PresentCurrentList))
-                except:
-                    pass
+                if "PresentPosition_Degrees" in DynamixelProtocol2Xseries_MostRecentDict:
+                    DynamixelProtocol2Xseries_MostRecentDict_PresentPositionDegreesList = DynamixelProtocol2Xseries_MostRecentDict["PresentPosition_Degrees"]
 
+                if "PresentCurrent" in DynamixelProtocol2Xseries_MostRecentDict:
+                    DynamixelProtocol2Xseries_MostRecentDict_PresentCurrentList = DynamixelProtocol2Xseries_MostRecentDict["PresentCurrent"]
+
+                if "ErrorFlag_Overload_Received" in DynamixelProtocol2Xseries_MostRecentDict:
+                    DynamixelProtocol2Xseries_MostRecentDict_ErrorFlag_Overload_Received = DynamixelProtocol2Xseries_MostRecentDict["ErrorFlag_Overload_Received"]
+                    DynamixelProtocol2Xseries_MostRecentDict_ErrorFlag_ElectricalShock_Received = DynamixelProtocol2Xseries_MostRecentDict["ErrorFlag_ElectricalShock_Received"]
+                    DynamixelProtocol2Xseries_MostRecentDict_ErrorFlag_MotorEncoder_Received = DynamixelProtocol2Xseries_MostRecentDict["ErrorFlag_MotorEncoder_Received"]
+                    DynamixelProtocol2Xseries_MostRecentDict_ErrorFlag_Overheating_Received = DynamixelProtocol2Xseries_MostRecentDict["ErrorFlag_Overheating_Received"]
+                    DynamixelProtocol2Xseries_MostRecentDict_ErrorFlag_InputVoltage_Received = DynamixelProtocol2Xseries_MostRecentDict["ErrorFlag_InputVoltage_Received"]
+                    DynamixelProtocol2Xseries_MostRecentDict_ErrorFlag_SerialCommunication = DynamixelProtocol2Xseries_MostRecentDict["ErrorFlag_SerialCommunication"]
+                    DynamixelProtocol2Xseries_MostRecentDict_ErrorFlag_OperatingModeMismatch = DynamixelProtocol2Xseries_MostRecentDict["ErrorFlag_OperatingModeMismatch"]
 
         ##########################################################################################################
         ##########################################################################################################
@@ -856,16 +885,9 @@ if __name__ == '__main__':
         ##########################################################################################################
         if USE_DynamixelProtocol2Xseries_FLAG == 1:
 
-            time_gain = math.pi / (2.0 * SINUSOIDAL_MOTION_INPUT_ROMtestTimeToPeakAngle)
-
-            if LoopCounter == 500:
-                for DynamixelChannel in range(0, len(DynamixelProtocol2Xseries_TestChannelsList)):
-                    if DynamixelChannel in DynamixelProtocol2Xseries_TestChannelsList:
-                        DynamixelProtocol2Xseries_Object.SetEngagedState_FROM_EXTERNAL_PROGRAM(DynamixelChannel, 1)
-                        print("Motor " + str(DynamixelChannel) + "engaged!")
-
             if USE_SINUSOIDAL_POS_CONTROL_INPUT_FLAG == 1:
 
+                time_gain = math.pi / (2.0 * SINUSOIDAL_MOTION_INPUT_ROMtestTimeToPeakAngle)
                 SINUSOIDAL_INPUT_TO_COMMAND_0 = (SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_0 + SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_0)/2.0 + 0.5*abs(SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_0 - SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_0)*math.sin(time_gain*CurrentTime_MainLoopThread)
                 SINUSOIDAL_INPUT_TO_COMMAND_1 = (SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_1 + SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_1)/2.0 + 0.5*abs(SINUSOIDAL_MOTION_INPUT_MaxValue_PositionControl_1 - SINUSOIDAL_MOTION_INPUT_MinValue_PositionControl_1)*math.sin(math.pi/2.0 + time_gain*CurrentTime_MainLoopThread)
 
@@ -891,7 +913,7 @@ if __name__ == '__main__':
 
         ##########################################################################################################
         ##########################################################################################################
-        if PLOTTER_OPEN_FLAG == 1:
+        if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG == 1:
 
             ##########################################################################################################
             MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.GetMostRecentDataDict()
@@ -901,7 +923,7 @@ if __name__ == '__main__':
 
                 if MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag == 1:
                     if CurrentTime_MainLoopThread - LastTime_MainLoopThread_PLOTTER >= 0.030:
-                        MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot(["Channel0"], [CurrentTime_MainLoopThread]*1, [DynamixelProtocol2Xseries_PresentPositionDegreesList[0]])
+                        MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot(["Channel0"], [CurrentTime_MainLoopThread]*1, [DynamixelProtocol2Xseries_MostRecentDict_PresentPositionDegreesList[0]])
                         LastTime_MainLoopThread_PLOTTER = CurrentTime_MainLoopThread
             ##########################################################################################################
 
@@ -933,14 +955,14 @@ if __name__ == '__main__':
 
     ##########################################################################################################
     ##########################################################################################################
-    if MYPRINT_OPEN_FLAG == 1:
+    if MyPrint_OPEN_FLAG == 1:
         MyPrint_ReubenPython2and3ClassObject.ExitProgram_Callback()
     ##########################################################################################################
     ##########################################################################################################
 
     ##########################################################################################################
     ##########################################################################################################
-    if PLOTTER_OPEN_FLAG == 1:
+    if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG == 1:
         MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExitProgram_Callback()
     ##########################################################################################################
     ##########################################################################################################

@@ -6,9 +6,9 @@ reuben.brewer@gmail.com,
 www.reubotics.com
 
 Apache 2 License
-Software Revision M, 07/31/2024
+Software Revision N, 10/17/2024
 
-Verified working on: Python 3.8 for Windows 8.1, 10 64-bit, Ubuntu 20.04, and Raspberry Pi Buster (no Mac testing yet).
+Verified working on: Python 3.12 for Windows 8.1, 10 64-bit, Ubuntu 20.04, and Raspberry Pi Buster (no Mac testing yet).
 THE SEPARATE-PROCESS-SPAWNING COMPONENT OF THIS CLASS IS NOT AVAILABLE IN PYTHON 2 DUE TO LIMITATION OF
 "multiprocessing.set_start_method('spawn', force=True)" ONLY BEING AVAILABLE IN PYTHON 3. PLOTTING WITHIN A SINGLE PROCESS STILL WORKS.
 '''
@@ -1139,28 +1139,34 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
     def ConvertMathPointToCanvasCoordinates(self, PointListXY):
 
         try:
-            x = PointListXY[0]
-            y = PointListXY[1]
 
-            W = self.GraphCanvasWidth*0.8 # #If we use the whole width, then we'll clip labels, tick marks, etc.
-            H = self.GraphCanvasHeight*0.9 # #If we use the whole width, then we'll clip labels, tick marks, etc.
+            if (self.X_max - self.X_min) != 0.0 and (self.Y_max - self.Y_min) != 0.0:
 
-            m_Xaxis = ((W - self.GraphBoxOutline_X0)/(self.X_max - self.X_min))
-            b_Xaxis = W - m_Xaxis*self.X_max
+                x = PointListXY[0]
+                y = PointListXY[1]
 
-            X_out = m_Xaxis*x + b_Xaxis
+                W = self.GraphCanvasWidth*0.8 # #If we use the whole width, then we'll clip labels, tick marks, etc.
+                H = self.GraphCanvasHeight*0.9 # #If we use the whole width, then we'll clip labels, tick marks, etc.
 
+                m_Xaxis = ((W - self.GraphBoxOutline_X0)/(self.X_max - self.X_min))
+                b_Xaxis = W - m_Xaxis*self.X_max
 
-            m_Yaxis = ((H - self.GraphBoxOutline_Y0) / (self.Y_max - self.Y_min))
-            b_Yaxis = H - m_Yaxis * self.Y_max
-
-            Y_out = m_Yaxis * y + b_Yaxis
+                X_out = m_Xaxis*x + b_Xaxis
 
 
-            X_out = X_out
-            Y_out = self.GraphCanvasHeight - Y_out #Flip y-axis
+                m_Yaxis = ((H - self.GraphBoxOutline_Y0) / (self.Y_max - self.Y_min))
+                b_Yaxis = H - m_Yaxis * self.Y_max
 
-            return [X_out, Y_out]
+                Y_out = m_Yaxis * y + b_Yaxis
+
+
+                X_out = X_out
+                Y_out = self.GraphCanvasHeight - Y_out #Flip y-axis
+
+                return [X_out, Y_out]
+
+            else:
+                return PointListXY
 
         except:
             exceptions = sys.exc_info()[0]
