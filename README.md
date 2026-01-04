@@ -12,15 +12,15 @@ www.reubotics.com
 
 Apache 2 License
 
-Software Revision L, 10/17/2024
+Software Revision M-TENTATIVE, 12/27/2025
 
 Verified working on:
 
-Python 3.12.
+Python 3.11/12/13.
 
 Windows 10, 11 64-bit
 
-Raspberry Pi Buster
+Raspberry Pi Bookworm
 
 (no Mac testing yet)
 
@@ -50,13 +50,13 @@ This code isn't "installed" like a typical python module (no "pip install MyModu
 
 ###
 
-DynamixelProtocol2Xseries_ReubenPython3Class, ListOfModuleDependencies: ['dynamixel_sdk', 'ftd2xx', 'LowPassFilter_ReubenPython2and3Class', 'serial', 'serial.tools']
+DynamixelProtocol2Xseries_ReubenPython3Class, ListOfModuleDependencies: ['dynamixel_sdk', 'ftd2xx', 'LowPassFilter_ReubenPython2and3Class', 'ReubenGithubCodeModulePaths', 'serial', 'serial.tools']
 
-DynamixelProtocol2Xseries_ReubenPython3Class, ListOfModuleDependencies_TestProgram: ['MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class', 'MyPrint_ReubenPython2and3Class']
+DynamixelProtocol2Xseries_ReubenPython3Class, ListOfModuleDependencies_TestProgram: ['MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class', 'MyPrint_ReubenPython2and3Class', 'ReubenGithubCodeModulePaths']
 
-DynamixelProtocol2Xseries_ReubenPython3Class, ListOfModuleDependencies_NestedLayers: ['future.builtins', 'numpy', 'pexpect', 'psutil']
+DynamixelProtocol2Xseries_ReubenPython3Class, ListOfModuleDependencies_NestedLayers: ['GetCPUandMemoryUsageOfProcessByPID_ReubenPython3Class', 'numpy', 'pexpect', 'psutil', 'pyautogui', 'ReubenGithubCodeModulePaths']
 
-DynamixelProtocol2Xseries_ReubenPython3Class, ListOfModuleDependencies_All:['dynamixel_sdk', 'ftd2xx', 'future.builtins', 'LowPassFilter_ReubenPython2and3Class', 'MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class', 'MyPrint_ReubenPython2and3Class', 'numpy', 'pexpect', 'psutil', 'serial', 'serial.tools']
+DynamixelProtocol2Xseries_ReubenPython3Class, ListOfModuleDependencies_All:['dynamixel_sdk', 'ftd2xx', 'GetCPUandMemoryUsageOfProcessByPID_ReubenPython3Class', 'LowPassFilter_ReubenPython2and3Class', 'MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class', 'MyPrint_ReubenPython2and3Class', 'numpy', 'pexpect', 'psutil', 'pyautogui', 'ReubenGithubCodeModulePaths', 'serial', 'serial.tools']
 
 ###
 
