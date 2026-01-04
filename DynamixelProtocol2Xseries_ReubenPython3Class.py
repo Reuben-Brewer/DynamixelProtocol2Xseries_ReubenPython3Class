@@ -6,12 +6,20 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision L, 10/17/2024
+Software Revision M, 12/27/2025
 
-Verified working on: Python 3.12 for Windows 11 64-bit and Raspberry Pi Buster (no Mac testing yet).
+Verified working on: Python 3.11/12/13 for Windows 10/11 64-bit and Raspberry Pi Bookworm (no Mac testing yet).
 '''
 
 __author__ = 'reuben.brewer'
+
+##########################################################################################################
+##########################################################################################################
+
+##########################################
+import ReubenGithubCodeModulePaths #Replaces the need to have "ReubenGithubCodeModulePaths.pth" within "C:\Anaconda3\Lib\site-packages".
+ReubenGithubCodeModulePaths.Enable()
+##########################################
 
 ##########################################
 from LowPassFilter_ReubenPython2and3Class import *
@@ -26,6 +34,7 @@ import datetime
 import threading
 import collections
 from copy import * #for deepcopy
+import math
 import traceback
 ##########################################
 
@@ -79,7 +88,9 @@ current_units_acceptable_list = ["raw", "dynamixelunits", "milliamps", "amps", "
 OperatingMode_AcceptableStringValuesList = ["CurrentControl", "VelocityControl", "PositionControl", "ExtendedPositionControlMultiTurn", "CurrentBasedPositionControl", "PWMcontrol"]
 ##########################################
 
-#http://stackoverflow.com/questions/19087515/subclassing-tkinter-to-create-a-custom-widget
+##########################################################################################################
+##########################################################################################################
+
 class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
     ##########################################################################################################
@@ -168,7 +179,9 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                                              "PresentPosition",
                                              "PresentInputVoltage",
                                              "PresentTemperature",
-                                             "Shutdown"]
+                                             "Shutdown",
+                                             "Watchdog",
+                                             "TorqueEnable"]
 
 
 
@@ -193,16 +206,6 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                 self.USE_GUI_FLAG = 0
 
             print("DynamixelProtocol2Xseries_ReubenPython3Class __init__: USE_GUI_FLAG: " + str(self.USE_GUI_FLAG))
-            #########################################################
-            #########################################################
-
-            #########################################################
-            #########################################################
-            if "root" in self.GUIparametersDict:
-                self.root = self.GUIparametersDict["root"]
-            else:
-                print("DynamixelProtocol2Xseries_ReubenPython3Class __init__: ERROR, must pass in 'root'")
-                return
             #########################################################
             #########################################################
 
@@ -478,10 +481,12 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
         #########################################################
         if "WatchdogTimeIntervalMilliseconds" in setup_dict:
             WatchdogTimeIntervalMilliseconds_TEMP = setup_dict["WatchdogTimeIntervalMilliseconds"]
+
             if int(WatchdogTimeIntervalMilliseconds_TEMP) in [-1, 0]:
-                self.WatchdogTimeIntervalMilliseconds = WatchdogTimeIntervalMilliseconds_TEMP
+                self.WatchdogTimeIntervalMilliseconds = int(WatchdogTimeIntervalMilliseconds_TEMP)
+
             else:
-                self.WatchdogTimeIntervalMilliseconds = self.PassThroughFloatValuesInRange_ExitProgramOtherwise("WatchdogTimeIntervalMilliseconds", WatchdogTimeIntervalMilliseconds_TEMP, 20.0*1, 20.0*127) 
+                self.WatchdogTimeIntervalMilliseconds = self.PassThroughFloatValuesInRange_ExitProgramOtherwise("WatchdogTimeIntervalMilliseconds", WatchdogTimeIntervalMilliseconds_TEMP, 20.0*1, 20.0*127)
 
         else:
             self.WatchdogTimeIntervalMilliseconds = -1 #Off
@@ -1161,13 +1166,13 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
         #########################################################
         #########################################################
         try:
-            self.DataStreamingFrequency_Tx_CalculatedFromMainThread_LowPassFilter_ReubenPython2and3ClassObject = LowPassFilter_ReubenPython2and3Class(dict([("UseMedianFilterFlag", 1),
-                                                                                                            ("UseExponentialSmoothingFilterFlag", 1),
-                                                                                                            ("ExponentialSmoothingFilterLambda", 0.05)])) #new_filtered_value = k * raw_sensor_value + (1 - k) * old_filtered_value
+            self.DataStreamingFrequency_Tx_CalculatedFromMainThread_LowPassFilter_Object = LowPassFilter_ReubenPython2and3Class(dict([("UseMedianFilterFlag", 0),
+                                                                                                                                    ("UseExponentialSmoothingFilterFlag", 1),
+                                                                                                                                    ("ExponentialSmoothingFilterLambda", 0.05)])) #new_filtered_value = k * raw_sensor_value + (1 - k) * old_filtered_value
 
         except:
             exceptions = sys.exc_info()[0]
-            print("DynamixelProtocol2Xseries_ReubenPython3Class __init__: DataStreamingFrequency_Tx_CalculatedFromMainThread_LowPassFilter_ReubenPython2and3ClassObject, Exceptions: %s" % exceptions)
+            print("DynamixelProtocol2Xseries_ReubenPython3Class __init__: DataStreamingFrequency_Tx_CalculatedFromMainThread_LowPassFilter_Object, Exceptions: %s" % exceptions)
             traceback.print_exc()
             return
         #########################################################
@@ -1176,9 +1181,9 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
         #########################################################
         #########################################################
         try:
-            self.DataStreamingFrequency_Rx_CalculatedFromMainThread_LowPassFilter_ReubenPython2and3ClassObject = LowPassFilter_ReubenPython2and3Class(dict([("UseMedianFilterFlag", 1),
-                                                                                                            ("UseExponentialSmoothingFilterFlag", 1),
-                                                                                                            ("ExponentialSmoothingFilterLambda", 0.05)])) #new_filtered_value = k * raw_sensor_value + (1 - k) * old_filtered_value
+            self.DataStreamingFrequency_Rx_CalculatedFromMainThread_LowPassFilter_Object = LowPassFilter_ReubenPython2and3Class(dict([("UseMedianFilterFlag", 0),
+                                                                                                                                    ("UseExponentialSmoothingFilterFlag", 1),
+                                                                                                                                    ("ExponentialSmoothingFilterLambda", 0.05)])) #new_filtered_value = k * raw_sensor_value + (1 - k) * old_filtered_value
 
         except:
             exceptions = sys.exc_info()[0]
@@ -1326,19 +1331,6 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
         #########################################################
         self.MainThread_ThreadingObject = threading.Thread(target=self.MainThread, args=())
         self.MainThread_ThreadingObject.start()
-        #########################################################
-        #########################################################
-
-        #########################################################
-        #########################################################
-        if self.USE_GUI_FLAG == 1:
-            self.StartGUI(self.root)
-        #########################################################
-        #########################################################
-
-        #########################################################
-        #########################################################
-        time.sleep(0.25)
         #########################################################
         #########################################################
 
@@ -1924,7 +1916,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
 
             if self.DataStreamingDeltaT_Tx_CalculatedFromMainThread != 0.0:
                 DataStreamingFrequency_Tx_CalculatedFromMainThread_TEMP = 1.0/self.DataStreamingDeltaT_Tx_CalculatedFromMainThread
-                self.DataStreamingFrequency_Tx_CalculatedFromMainThread = self.DataStreamingFrequency_Tx_CalculatedFromMainThread_LowPassFilter_ReubenPython2and3ClassObject.AddDataPointFromExternalProgram(DataStreamingFrequency_Tx_CalculatedFromMainThread_TEMP)["SignalOutSmoothed"]
+                self.DataStreamingFrequency_Tx_CalculatedFromMainThread = self.DataStreamingFrequency_Tx_CalculatedFromMainThread_LowPassFilter_Object.AddDataPointFromExternalProgram(DataStreamingFrequency_Tx_CalculatedFromMainThread_TEMP)["SignalOutSmoothed"]
 
             self.LastTime_Tx_CalculatedFromMainThread = self.CurrentTime_Tx_CalculatedFromMainThread
         except:
@@ -1943,7 +1935,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
 
             if self.DataStreamingDeltaT_Rx_CalculatedFromMainThread != 0.0:
                 DataStreamingFrequency_Rx_CalculatedFromMainThread_TEMP = 1.0/self.DataStreamingDeltaT_Rx_CalculatedFromMainThread
-                self.DataStreamingFrequency_Rx_CalculatedFromMainThread = self.DataStreamingFrequency_Rx_CalculatedFromMainThread_LowPassFilter_ReubenPython2and3ClassObject.AddDataPointFromExternalProgram(DataStreamingFrequency_Rx_CalculatedFromMainThread_TEMP)["SignalOutSmoothed"]
+                self.DataStreamingFrequency_Rx_CalculatedFromMainThread = self.DataStreamingFrequency_Rx_CalculatedFromMainThread_LowPassFilter_Object.AddDataPointFromExternalProgram(DataStreamingFrequency_Rx_CalculatedFromMainThread_TEMP)["SignalOutSmoothed"]
 
             self.LastTime_Rx_CalculatedFromMainThread = self.CurrentTime_Rx_CalculatedFromMainThread
         except:
@@ -2020,7 +2012,7 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
 
     ##########################################################################################################
     ##########################################################################################################
-    def ResetWatchdogTimerInMilliseconds(self, MotorID):
+    def DeactivateOrClearErrorInWatchdogTimer(self, MotorID):
         self.SetWatchdogTimerInMilliseconds(MotorID, 0)
     ##########################################################################################################
     ##########################################################################################################
@@ -2031,19 +2023,32 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
 
         if WatchdogTimerDurationMilliseconds_Input >= 0:
 
-            ADDR_PRO_GOAL_Watchdog = 98
+            ##########################################################################################################
+            SuccessFlag = 0
+            try:
+                if "TorqueEnable" in self.MostRecentDataDict:
+                    if self.MostRecentDataDict["TorqueEnable"][MotorID] > 0:
+                        SuccessFlag = 1
+            except:
+                pass
+            ##########################################################################################################
 
-            WatchdogTimerValueToWrite_limited = int(self.LimitNumber_IntOutputOnly(0, 127, round(WatchdogTimerDurationMilliseconds_Input/20.0))) #1 is the actual minimum, but 0 clears the watchdog timer
 
-            print("SetWatchdogTimerInMilliseconds on motor " + str(MotorID) + " to a value of " + str(WatchdogTimerValueToWrite_limited))
+            if 1: #SuccessFlag == 1:
 
-            dxl_comm_result = self.packetHandler.write1ByteTxOnly(self.portHandler, MotorID, ADDR_PRO_GOAL_Watchdog, 1)
+                ADDR_PRO_GOAL_Watchdog = 98
 
-            if dxl_comm_result != COMM_SUCCESS:
-                dummy_var = 0
-                print("SetWatchdogTimerInMilliseconds, %s" % self.packetHandler.getTxRxResult(dxl_comm_result))
-            else:
-                self.WatchdogTimerDurationMilliseconds[MotorID] = WatchdogTimerValueToWrite_limited
+                WatchdogTimerValueToWrite_limited = int(self.LimitNumber_IntOutputOnly(0, 127, round(WatchdogTimerDurationMilliseconds_Input/20.0))) #1 is the actual minimum, but 0 clears the watchdog timer
+
+                print("SetWatchdogTimerInMilliseconds on motor " + str(MotorID) + " to a value of " + str(WatchdogTimerValueToWrite_limited))
+
+                dxl_comm_result = self.packetHandler.write1ByteTxOnly(self.portHandler, MotorID, ADDR_PRO_GOAL_Watchdog, WatchdogTimerValueToWrite_limited)
+
+                if dxl_comm_result != COMM_SUCCESS:
+                    dummy_var = 0
+                    print("SetWatchdogTimerInMilliseconds, ERROR %s" % self.packetHandler.getTxRxResult(dxl_comm_result))
+                else:
+                    self.WatchdogTimerDurationMilliseconds[MotorID] = WatchdogTimerValueToWrite_limited
 
     ##########################################################################################################
     ##########################################################################################################
@@ -2683,6 +2688,12 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
             elif VariableNameString == "Shutdown":
                 PortRegister = 63
                 ReadLength = 1
+            elif VariableNameString == "Watchdog":
+                PortRegister = 98
+                ReadLength = 1
+            elif VariableNameString == "TorqueEnable":
+                PortRegister = 64
+                ReadLength = 1
             else:
                 self.print("$$$$$$$$$$$$$$$$$$$$$$$$$ ReadVariable ERROR: Variable name '" + VariableNameString + " is no valid! $$$$$$$$$$$$$$$$$$$$$$$$$")
                 return "error_VariableNameString"
@@ -2721,11 +2732,11 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
 
             ##########################################################
             if dxl_comm_result != COMM_SUCCESS:
-                print("MotorID = " + str(MotorID) +", ReadVariable: error_serial_dxl_comm with dxl_data = " + str(dxl_data))
+                #print("MotorID = " + str(MotorID) +", ReadVariable: error_serial_dxl_comm with dxl_data = " + str(dxl_data))
                 self.portHandler.clearPort()
                 return
             elif dxl_error != 0:
-                print("MotorID = " + str(MotorID) + ", ReadVariable: error_serial_dxl_error with dxl_data = " + str(dxl_data))
+                #print("MotorID = " + str(MotorID) + ", ReadVariable: error_serial_dxl_error with dxl_data = " + str(dxl_data))
                 self.portHandler.clearPort()
             ##########################################################
 
@@ -2764,6 +2775,16 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                 self.ErrorFlag_Overheating_Received[MotorID] = (self.ErrorFlag_BYTE[MotorID] & 0b00000100)  # Bit 2 --> Overheating Error. Set to 1 if the internal temperature of the Dynamixel unit is above the operating temperature range as defined in the control table.
                 # Bit 1 --> 0
                 self.ErrorFlag_InputVoltage_Received[MotorID] = (self.ErrorFlag_BYTE[MotorID] & 0b00000001)  # Bit 0 --> Input Voltage Error. Set to 1 if the voltage is out of the operating voltage range as defined in the control table.
+
+            elif VariableNameString == "Watchdog":
+                Data_Value = self.ConvertUnsignedToSignedInteger(dxl_data, 1)
+
+            elif VariableNameString == "TorqueEnable":
+                if dxl_data == 0:
+                    Data_Value = 0
+                else:
+                    Data_Value = 1
+
 
             else:
                 Data_Value = dxl_data
@@ -3030,10 +3051,14 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
         else:
             self.SetEngagedState_FROM_EXTERNAL_PROGRAM(MotorIndex, 1)
 
-        #self.ResetWatchdogTimerInMilliseconds(MotorIndex)
-        #time.sleep(self.TimeToWaitBetweenCriticalInstructions)
-        #self.SetWatchdogTimerInMilliseconds(MotorIndex,  self.WatchdogTimeIntervalMilliseconds)
-        #time.sleep(self.TimeToWaitBetweenCriticalInstructions)
+        time.sleep(0.25)
+
+        if self.WatchdogTimeIntervalMilliseconds > 0:
+            #self.DeactivateOrClearErrorInWatchdogTimer(MotorIndex)
+            time.sleep(self.TimeToWaitBetweenCriticalInstructions)
+            for counter in range(0, 10):
+                self.SetWatchdogTimerInMilliseconds(MotorIndex, self.WatchdogTimeIntervalMilliseconds)
+                time.sleep(self.TimeToWaitBetweenCriticalInstructions)
 
         #'''
         ################################################
@@ -3270,6 +3295,15 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
                     ##############################################################################################
 
                     for MotorIndex in range(0, self.NumberOfMotors):
+
+                        ##############################################################################################
+                        ##############################################################################################
+                        if self.WatchdogTimeIntervalMilliseconds > 0:
+                            dummy = 0
+                            #self.DeactivateOrClearErrorInWatchdogTimer(MotorIndex)
+                            #self.SetWatchdogTimerInMilliseconds(MotorIndex, self.WatchdogTimeIntervalMilliseconds)
+                        ##############################################################################################
+                        ##############################################################################################
 
                         ##############################################################################################
                         ##############################################################################################
@@ -3601,23 +3635,15 @@ class DynamixelProtocol2Xseries_ReubenPython3Class(Frame): #Subclass the Tkinter
 
     ##########################################################################################################
     ##########################################################################################################
-    def StartGUI(self, GuiParent):
-
-        self.GUI_Thread(GuiParent)
-    ##########################################################################################################
-    ##########################################################################################################
-
-    ##########################################################################################################
-    ##########################################################################################################
-    def GUI_Thread(self, parent):
+    def CreateGUIobjects(self, TkinterParent):
 
         try:
-            print("Starting the GUI_Thread for DynamixelProtocol2Xseries_ReubenPython3Class object.")
+            print("DynamixelProtocol2Xseries_ReubenPython3Class, CreateGUIobjects event fired.")
 
             ##########################################################################################################
             ##########################################################################################################
-            self.root = parent
-            self.parent = parent
+            self.root = TkinterParent
+            self.parent = TkinterParent
             ##########################################################################################################
             ##########################################################################################################
 
