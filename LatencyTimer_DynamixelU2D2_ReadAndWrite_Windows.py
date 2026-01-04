@@ -6,9 +6,9 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision D, 03/13/2022
+Software Revision M, 12/27/2025
 
-Verified working on: Python 2.7, 3.8 for Windows 8.1, 10 64-bit and Raspberry Pi Buster (no Mac testing yet).
+Verified working on: Python 3.11/12/13 for Windows 10/11 64-bit and Raspberry Pi Bookworm (no Mac testing yet).
 '''
 
 import sys
@@ -21,7 +21,7 @@ import elevate #Elevates your python's script's permission to "Admin". IF YOU DO
 #import commandRunner #https://pypi.org/project/commandRunner/#files From commandRunner-0.8.12.tar.gz, run "python setup.py install" (pip fails)
 
 if _platform == "win32":
-    from _winreg import *
+    from winreg import *
 
 #######################################################################################################################
 #######################################################################################################################
@@ -111,11 +111,11 @@ if __name__ == '__main__':
     print("The OS platform is: " + my_platform)
     ###############################################################
 
-    LatencyTimerValueInMilliseconds_ToWrite = 8
+    LatencyTimerValueInMilliseconds_ToWrite = 1
 
     ############################
     global DynamixelU2D2_SerialNumber
-    DynamixelU2D2_SerialNumber = "FT3M9STOA" #SerialNumber like 'FT3M9STOA'
+    DynamixelU2D2_SerialNumber = "FT94VSKVA" #SerialNumber like 'FT3M9STOA'
     ############################
 
     ############################
